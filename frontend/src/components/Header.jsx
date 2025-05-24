@@ -16,89 +16,131 @@ const Header = () => {
       variants={headerVariants}
       initial="hidden"
       animate="visible"
-      className="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-blue-800 to-purple-900 text-white"
+      className="relative overflow-hidden bg-gradient-to-br from-emerald-800 via-emerald-700 to-green-800 text-white"
     >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-black/20">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+      {/* Islamic geometric pattern overlay */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M40 40l20-20v40l-20-20zm20 20l20-20v40l-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '80px 80px'
+        }}></div>
+      </div>
+
+      {/* Paper texture overlay */}
+      <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E")`,
+          backgroundSize: '4px 4px'
+        }}></div>
       </div>
       
       {/* Navigation */}
-      <nav className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
+      <nav className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex items-center justify-center">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-3"
           >
-            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z" />
-                <path fillRule="evenodd" d="M3 8a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 13a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+            {/* Islamic crescent and star icon */}
+            <div className="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10">
+              <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
               </svg>
             </div>
-            <h1 className="text-xl font-bold">Scholar Library</h1>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-white">المكتبة الإسلامية</h1>
+              <p className="text-emerald-100 text-sm font-medium">Islamic Digital Library</p>
+            </div>
           </motion.div>
-          
-          <motion.button
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg font-medium hover:bg-white/30 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50"
-            aria-label="Admin Login"
-          >
-            Admin Login
-          </motion.button>
         </div>
       </nav>
       
       {/* Hero Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-        <motion.h2
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.8 }}
-          className="text-4xl md:text-6xl font-bold mb-6 leading-tight"
+          className="mb-8"
         >
-          Discover Knowledge from
-          <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
-            Renowned Scholars
-          </span>
-        </motion.h2>
+          {/* Arabic title */}
+          <h2 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-white" dir="rtl">
+            اكتشف الحكمة من
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-200 mt-2">
+              العلماء المعاصرين
+            </span>
+          </h2>
+          
+          {/* English subtitle */}
+          <h3 className="text-xl md:text-3xl font-semibold text-emerald-100 mt-6">
+            Discover Wisdom from
+            <span className="block text-white/90">Contemporary Scholars</span>
+          </h3>
+        </motion.div>
         
         <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed"
+          className="text-lg md:text-xl text-emerald-50 mb-12 max-w-4xl mx-auto leading-relaxed"
         >
-          Access a curated collection of academic works, research papers, and scholarly publications from distinguished professors and researchers worldwide.
+          Access authentic Islamic knowledge through curated works, research papers, and scholarly publications from distinguished Islamic scholars and researchers worldwide.
         </motion.p>
         
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8, duration: 0.8 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+          className="flex flex-col sm:flex-row gap-6 justify-center items-center"
         >
-          <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-3 rounded-lg font-semibold hover:from-yellow-300 hover:to-orange-400 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-indigo-900">
-            Explore Collection
+          <button className="group bg-gradient-to-r from-white to-emerald-50 text-emerald-800 px-8 py-4 rounded-2xl font-semibold hover:from-emerald-50 hover:to-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg hover:shadow-xl">
+            <span className="flex items-center gap-2">
+              استكشف المجموعة
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </span>
           </button>
           
-          <button className="border-2 border-white/50 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all duration-300 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50">
-            Browse Categories
+          <button className="group border-2 border-white/30 text-white px-8 py-4 rounded-2xl font-semibold hover:bg-white/10 hover:border-white/50 transition-all duration-300 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50">
+            <span className="flex items-center gap-2">
+              Browse Categories
+              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </span>
           </button>
         </motion.div>
       </div>
       
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-xl"></div>
-        <div className="absolute top-20 -right-10 w-60 h-60 bg-purple-400/10 rounded-full blur-2xl"></div>
-        <div className="absolute -bottom-10 left-1/2 w-80 h-80 bg-blue-400/5 rounded-full blur-3xl"></div>
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.05, 0.1]
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute -top-20 -left-20 w-60 h-60 bg-white rounded-full blur-3xl"
+        ></motion.div>
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.05, 0.1, 0.05]
+          }}
+          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+          className="absolute top-32 -right-20 w-80 h-80 bg-emerald-300 rounded-full blur-3xl"
+        ></motion.div>
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.15, 1],
+            opacity: [0.08, 0.03, 0.08]
+          }}
+          transition={{ duration: 12, repeat: Infinity, delay: 4 }}
+          className="absolute -bottom-20 left-1/3 w-96 h-96 bg-green-200 rounded-full blur-3xl"
+        ></motion.div>
       </div>
     </motion.header>
   );
