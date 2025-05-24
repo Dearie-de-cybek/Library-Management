@@ -10,7 +10,7 @@ import "./index.css";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/" element={<Home />} />
     </Routes>
   );
 }
