@@ -50,8 +50,13 @@ const Header = () => {
               </svg>
             </div>
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-white">المكتبة الإسلامية</h1>
-              <p className="text-emerald-100 text-sm font-medium">Islamic Digital Library</p>
+              {/* Arabic title with English translation */}
+              <h1 className="text-2xl font-bold text-white" dir="rtl">
+                المكتبة الإسلامية
+                <span className="block text-emerald-100 text-sm font-medium" dir="ltr">
+                  Islamic Digital Library
+                </span>
+              </h1>
             </div>
           </motion.div>
         </div>
@@ -65,7 +70,7 @@ const Header = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="mb-8"
         >
-          {/* Arabic title */}
+          {/* Arabic title with English translation */}
           <h2 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-white" dir="rtl">
             اكتشف الحكمة من
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-200 mt-2">
@@ -73,8 +78,8 @@ const Header = () => {
             </span>
           </h2>
           
-          {/* English subtitle */}
-          <h3 className="text-xl md:text-3xl font-semibold text-emerald-100 mt-6">
+          {/* English translation */}
+          <h3 className="text-xl md:text-3xl font-semibold text-emerald-100 mt-6" dir="ltr">
             Discover Wisdom from
             <span className="block text-white/90">Contemporary Scholars</span>
           </h3>
@@ -95,12 +100,16 @@ const Header = () => {
           transition={{ delay: 0.8, duration: 0.8 }}
           className="flex flex-col sm:flex-row gap-6 justify-center items-center"
         >
+          {/* Arabic button with English translation */}
           <button className="group bg-gradient-to-r from-white to-emerald-50 text-emerald-800 px-8 py-4 rounded-2xl font-semibold hover:from-emerald-50 hover:to-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white/50 shadow-lg hover:shadow-xl">
-            <span className="flex items-center gap-2">
-              استكشف المجموعة
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+            <span className="flex flex-col items-center gap-1">
+              <span className="flex items-center gap-2" dir="rtl">
+                استكشف المجموعة
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+              <span className="text-sm text-emerald-600" dir="ltr">Explore Collection</span>
             </span>
           </button>
           

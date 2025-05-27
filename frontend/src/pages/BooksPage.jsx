@@ -55,9 +55,9 @@ const BooksPage = () => {
   // Local utility function for formatting download counts
   const formatDownloadCount = (count) => {
     if (count >= 1000000) {
-      return `${(count / 1000000).toFixed(1)}م`;
+      return `${(count / 1000000).toFixed(1)}M`;
     } else if (count >= 1000) {
-      return `${(count / 1000).toFixed(1)}ك`;
+      return `${(count / 1000).toFixed(1)}K`;
     }
     return count.toString();
   };
@@ -85,7 +85,7 @@ const BooksPage = () => {
               className="absolute inset-2 border-4 border-emerald-600 border-t-transparent rounded-full"
             ></motion.div>
           </div>
-          <p className="text-xl text-emerald-800 font-medium">جاري تحميل الكتب...</p>
+          <p className="text-xl text-emerald-800 font-medium">Loading books...</p>
         </motion.div>
       </div>
     );
@@ -108,15 +108,15 @@ const BooksPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-emerald-800 mb-4" dir="rtl">
-            مكتبة الكتب الإسلامية
+          <h1 className="text-4xl md:text-5xl font-bold text-emerald-800 mb-4">
+            Islamic Books Library
           </h1>
           <h2 className="text-2xl md:text-3xl font-semibold text-emerald-700 mb-6">
-            Islamic Books Library
+            Digital Book Collection
           </h2>
           <div className="w-32 h-1 bg-gradient-to-r from-emerald-600 to-green-600 mx-auto mb-8 rounded-full"></div>
           <p className="text-lg text-gray-700 max-w-4xl mx-auto">
-            اكتشف مجموعتنا الشاملة من الكتب الإسلامية المتنوعة التي تغطي جميع جوانب العلوم الإسلامية والمعرفة الشرعية
+            Discover our comprehensive collection of diverse Islamic books covering all aspects of Islamic sciences and religious knowledge
           </p>
         </motion.div>
 
@@ -135,11 +135,10 @@ const BooksPage = () => {
               </svg>
               <input
                 type="text"
-                placeholder="ابحث في العنوان، المؤلف، أو الوصف..."
+                placeholder="Search by title, author, or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
-                dir="rtl"
               />
             </div>
 
@@ -149,7 +148,7 @@ const BooksPage = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
-              <option value="all">جميع التصنيفات</option>
+              <option value="all">All Categories</option>
               {categories.map(category => (
                 <option key={category} value={category}>{category}</option>
               ))}
@@ -161,10 +160,10 @@ const BooksPage = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
-              <option value="downloads">الأكثر تحميلاً</option>
-              <option value="title">ترتيب أبجدي</option>
-              <option value="author">حسب المؤلف</option>
-              <option value="year">الأحدث</option>
+              <option value="downloads">Most Downloaded</option>
+              <option value="title">Alphabetical</option>
+              <option value="author">By Author</option>
+              <option value="year">Newest</option>
             </select>
           </div>
 
@@ -172,7 +171,7 @@ const BooksPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-emerald-700 font-medium">
-                {filteredBooks.length} كتاب من أصل {books.length}
+                {filteredBooks.length} books out of {books.length}
               </span>
             </div>
 
@@ -246,7 +245,7 @@ const BooksPage = () => {
                     {/* View details overlay */}
                     <div className="absolute inset-0 bg-emerald-900/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                       <button className="bg-white text-emerald-800 px-6 py-3 rounded-xl font-bold hover:bg-emerald-50 transition-colors duration-200">
-                        عرض التفاصيل
+                        View Details
                       </button>
                     </div>
                   </div>
@@ -306,11 +305,11 @@ const BooksPage = () => {
                             <div className="bg-emerald-600 text-white px-4 py-2 rounded-xl">
                               <span className="font-bold">{formatDownloadCount(book.downloads)}</span>
                             </div>
-                            <span className="text-xs text-gray-500 mt-1 block">تحميل</span>
+                            <span className="text-xs text-gray-500 mt-1 block">downloads</span>
                           </div>
                           <div className="text-center">
                             <div className="text-gray-600 font-semibold">{book.pages}</div>
-                            <span className="text-xs text-gray-500">صفحة</span>
+                            <span className="text-xs text-gray-500">pages</span>
                           </div>
                         </div>
                       </div>
@@ -347,8 +346,8 @@ const BooksPage = () => {
             <svg className="w-16 h-16 text-emerald-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">لا توجد كتب</h3>
-            <p className="text-gray-500">جرب تعديل معايير البحث أو الفلترة</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No books found</h3>
+            <p className="text-gray-500">Try adjusting your search or filter criteria</p>
           </motion.div>
         )}
       </div>
@@ -373,7 +372,7 @@ const BooksPage = () => {
               {/* Modal Header */}
               <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold">تفاصيل الكتاب</h3>
+                  <h3 className="text-2xl font-bold">Book Details</h3>
                   <button
                     onClick={closeModal}
                     className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors duration-200"
@@ -399,25 +398,25 @@ const BooksPage = () => {
 
                   {/* Book Info */}
                   <div className="md:col-span-2">
-                    <h4 className="text-2xl font-bold text-gray-900 mb-3" dir="rtl">
+                    <h4 className="text-2xl font-bold text-gray-900 mb-3">
                       {selectedBook.title}
                     </h4>
                     
                     <div className="grid grid-cols-2 gap-4 mb-6">
                       <div>
-                        <span className="text-gray-600 text-sm">المؤلف:</span>
+                        <span className="text-gray-600 text-sm">Author:</span>
                         <p className="font-semibold text-emerald-700">{selectedBook.author}</p>
                       </div>
                       <div>
-                        <span className="text-gray-600 text-sm">التصنيف:</span>
+                        <span className="text-gray-600 text-sm">Category:</span>
                         <p className="font-semibold">{selectedBook.category}</p>
                       </div>
                       <div>
-                        <span className="text-gray-600 text-sm">عدد الصفحات:</span>
-                        <p className="font-semibold">{selectedBook.pages} صفحة</p>
+                        <span className="text-gray-600 text-sm">Pages:</span>
+                        <p className="font-semibold">{selectedBook.pages} pages</p>
                       </div>
                       <div>
-                        <span className="text-gray-600 text-sm">سنة النشر:</span>
+                        <span className="text-gray-600 text-sm">Published:</span>
                         <p className="font-semibold">{selectedBook.publishedYear}</p>
                       </div>
                       <div>
@@ -425,7 +424,7 @@ const BooksPage = () => {
                         <p className="font-semibold text-sm">{selectedBook.isbn}</p>
                       </div>
                       <div>
-                        <span className="text-gray-600 text-sm">اللغة:</span>
+                        <span className="text-gray-600 text-sm">Language:</span>
                         <p className="font-semibold">{selectedBook.language}</p>
                       </div>
                     </div>
@@ -440,22 +439,22 @@ const BooksPage = () => {
                         </div>
                         <div>
                           <p className="text-2xl font-bold text-emerald-800">{selectedBook.downloads.toLocaleString()}</p>
-                          <p className="text-emerald-600 text-sm">إجمالي التحميلات</p>
+                          <p className="text-emerald-600 text-sm">Total Downloads</p>
                         </div>
                       </div>
                     </div>
 
                     {/* Description */}
                     <div className="mb-6">
-                      <h5 className="font-bold text-gray-900 mb-3">وصف الكتاب:</h5>
-                      <p className="text-gray-700 leading-relaxed" dir="rtl">
+                      <h5 className="font-bold text-gray-900 mb-3">Description:</h5>
+                      <p className="text-gray-700 leading-relaxed">
                         {selectedBook.description}
                       </p>
                     </div>
 
                     {/* Tags */}
                     <div className="mb-6">
-                      <h5 className="font-bold text-gray-900 mb-3">الكلمات المفتاحية:</h5>
+                      <h5 className="font-bold text-gray-900 mb-3">Keywords:</h5>
                       <div className="flex flex-wrap gap-2">
                         {selectedBook.tags.map(tag => (
                           <span key={tag} className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
@@ -468,10 +467,10 @@ const BooksPage = () => {
                     {/* Action Buttons */}
                     <div className="flex gap-4">
                       <button className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200">
-                        تحميل الكتاب
+                        Download Book
                       </button>
                       <button className="px-6 py-3 border-2 border-emerald-600 text-emerald-600 rounded-xl font-bold hover:bg-emerald-50 transition-all duration-200">
-                        معاينة
+                        Preview
                       </button>
                     </div>
                   </div>

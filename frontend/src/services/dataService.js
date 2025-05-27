@@ -1,44 +1,44 @@
 export const mockScholars = [
   {
     id: 1,
-    name: "د. يوسف القرضاوي",
-    title: "عالم وفقيه معاصر",
-    institution: "الاتحاد العالمي لعلماء المسلمين",
+    name: "Dr. Yusuf Al-Qaradawi",
+    title: "Contemporary Scholar and Jurist",
+    institution: "International Union of Muslim Scholars",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
-    specialization: "الفقه الإسلامي المعاصر",
+    specialization: "Contemporary Islamic Jurisprudence",
     worksCount: 120,
-    bio: "عالم مسلم مؤثر، معروف بفتاواه المعاصرة وإسهاماته في الفقه الإسلامي الحديث. له دور بارز في تطبيق الشريعة الإسلامية على القضايا المعاصرة.",
+    bio: "Influential Muslim scholar, known for his contemporary fatwas and contributions to modern Islamic jurisprudence. He plays a prominent role in applying Islamic law to contemporary issues.",
     works: [
-      { id: 101, title: "الحلال والحرام في الإسلام", downloads: 45000, year: 2020 },
-      { id: 102, title: "فقه الزكاة", downloads: 32000, year: 2019 }
+      { id: 101, title: "The Lawful and Prohibited in Islam", downloads: 45000, year: 2020 },
+      { id: 102, title: "Fiqh of Zakat", downloads: 32000, year: 2019 }
     ]
   },
   {
     id: 2,
-    name: "د. طارق السويدان",
-    title: "داعية ومؤرخ إسلامي",
-    institution: "مؤسسة الإبداع الفكري",
+    name: "Dr. Tariq Al-Suwaidan",
+    title: "Islamic Preacher and Historian",
+    institution: "Intellectual Creativity Foundation",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
-    specialization: "التاريخ الإسلامي والدعوة",
+    specialization: "Islamic History and Da'wah",
     worksCount: 85,
-    bio: "مؤرخ وداعية كويتي، متخصص في التاريخ الإسلامي والحضارة الإسلامية. له إسهامات كبيرة في نشر الوعي بالتاريخ الإسلامي.",
+    bio: "Kuwaiti historian and preacher, specialized in Islamic history and Islamic civilization. He has made significant contributions to spreading awareness of Islamic history.",
     works: [
-      { id: 201, title: "صناع التاريخ", downloads: 28000, year: 2021 },
-      { id: 202, title: "الأندلس المفقود", downloads: 22000, year: 2020 }
+      { id: 201, title: "Makers of History", downloads: 28000, year: 2021 },
+      { id: 202, title: "Lost Andalusia", downloads: 22000, year: 2020 }
     ]
   },
   {
     id: 3,
-    name: "د. راغب السرجاني",
-    title: "مؤرخ وكاتب إسلامي",
-    institution: "موقع قصة الإسلام",
+    name: "Dr. Ragheb Al-Sirjani",
+    title: "Islamic Historian and Writer",
+    institution: "Story of Islam Website",
     image: "https://images.unsplash.com/photo-1594736797933-d0401ba6fe65?w=300&h=300&fit=crop&crop=face",
-    specialization: "التاريخ والحضارة الإسلامية",
+    specialization: "History and Islamic Civilization",
     worksCount: 95,
-    bio: "مؤرخ مصري متخصص في التاريخ الإسلامي، معروف بأسلوبه المبسط في عرض التاريخ الإسلامي والحضارة الإسلامية.",
+    bio: "Egyptian historian specialized in Islamic history, known for his simplified approach to presenting Islamic history and Islamic civilization.",
     works: [
-      { id: 301, title: "قصة الأندلس", downloads: 38000, year: 2022 },
-      { id: 302, title: "ماذا قدم المسلمون للعالم", downloads: 31000, year: 2021 }
+      { id: 301, title: "Story of Andalusia", downloads: 38000, year: 2022 },
+      { id: 302, title: "What Muslims Gave to the World", downloads: 31000, year: 2021 }
     ]
   }
 ];
@@ -46,87 +46,87 @@ export const mockScholars = [
 export const mockFeaturedBooks = [
   {
     id: 1,
-    title: "فهم القرآن الكريم في عصر التكنولوجيا",
-    author: "د. أحمد الزهراني",
-    category: "علوم القرآن",
+    title: "Understanding the Holy Quran in the Technology Age",
+    author: "Dr. Ahmad Al-Zahrani",
+    category: "Quranic Sciences",
     downloads: 52000,
     publishedYear: 2023,
     pages: 420,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-123456-78-9",
-    description: "دراسة معاصرة لفهم القرآن الكريم وتطبيق تعاليمه في عصر التكنولوجيا الحديثة، مع التركيز على التحديات المعاصرة والحلول الإسلامية.",
+    description: "A contemporary study on understanding the Holy Quran and applying its teachings in the age of modern technology, focusing on contemporary challenges and Islamic solutions.",
     coverImage: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400&h=600&fit=crop",
-    tags: ["القرآن الكريم", "التكنولوجيا", "الفقه المعاصر"]
+    tags: ["Holy Quran", "Technology", "Contemporary Jurisprudence"]
   },
   {
     id: 2,
-    title: "الاقتصاد الإسلامي: النظرية والتطبيق",
-    author: "د. محمد عبد المنعم",
-    category: "الاقتصاد الإسلامي",
+    title: "Islamic Economics: Theory and Application",
+    author: "Dr. Muhammad Abdul Mun'im",
+    category: "Islamic Economics",
     downloads: 34000,
     publishedYear: 2022,
     pages: 380,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-987654-32-1",
-    description: "نظرة شاملة على الاقتصاد الإسلامي ومبادئه وتطبيقاته في العالم المعاصر، مع دراسات حالة من دول مختلفة.",
+    description: "A comprehensive look at Islamic economics, its principles and applications in the contemporary world, with case studies from different countries.",
     coverImage: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=600&fit=crop",
-    tags: ["الاقتصاد الإسلامي", "البنوك الإسلامية", "التمويل"]
+    tags: ["Islamic Economics", "Islamic Banking", "Finance"]
   },
   {
     id: 3,
-    title: "منهج التربية الإسلامية للأطفال",
-    author: "د. فاطمة العلوي",
-    category: "التربية الإسلامية",
+    title: "Islamic Education Methods for Children",
+    author: "Dr. Fatima Al-Alawi",
+    category: "Islamic Education",
     downloads: 28000,
     publishedYear: 2023,
     pages: 320,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-456789-01-2",
-    description: "دليل شامل للتربية الإسلامية للأطفال في العصر الحديث، يجمع بين الأصالة والمعاصرة في أساليب التربية.",
+    description: "A comprehensive guide to Islamic education for children in the modern age, combining authenticity and modernity in educational methods.",
     coverImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
-    tags: ["التربية الإسلامية", "تربية الأطفال", "القيم الإسلامية"]
+    tags: ["Islamic Education", "Child Rearing", "Islamic Values"]
   },
   {
     id: 4,
-    title: "فقه المعاملات في الإسلام",
-    author: "د. عبد الله الغامدي",
-    category: "الفقه الإسلامي",
+    title: "Islamic Commercial Law (Fiqh al-Mu'amalat)",
+    author: "Dr. Abdullah Al-Ghamdi",
+    category: "Islamic Jurisprudence",
     downloads: 41000,
     publishedYear: 2022,
     pages: 500,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-246810-13-5",
-    description: "دراسة مفصلة لفقه المعاملات في الإسلام مع التطبيقات المعاصرة والحلول للمسائل الحديثة في التجارة والأعمال.",
+    description: "A detailed study of Islamic commercial law with contemporary applications and solutions for modern issues in trade and business.",
     coverImage: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=400&h=600&fit=crop",
-    tags: ["الفقه الإسلامي", "المعاملات", "التجارة الإسلامية"]
+    tags: ["Islamic Jurisprudence", "Commercial Law", "Islamic Trade"]
   },
   {
     id: 5,
-    title: "السيرة النبوية: دروس ومواعظ",
-    author: "د. محمد الأشقر",
-    category: "السيرة النبوية",
+    title: "Prophetic Biography: Lessons and Teachings",
+    author: "Dr. Muhammad Al-Ashqar",
+    category: "Prophetic Biography",
     downloads: 47000,
     publishedYear: 2023,
     pages: 450,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-135791-24-6",
-    description: "عرض شامل للسيرة النبوية مع استخلاص الدروس والعبر للمسلم المعاصر، وتطبيق النموذج النبوي في الحياة الحديثة.",
+    description: "A comprehensive presentation of the Prophetic biography with extracted lessons and morals for the contemporary Muslim, and applying the Prophetic model in modern life.",
     coverImage: "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=600&fit=crop",
-    tags: ["السيرة النبوية", "القدوة النبوية", "التاريخ الإسلامي"]
+    tags: ["Prophetic Biography", "Prophetic Example", "Islamic History"]
   },
   {
     id: 6,
-    title: "مقاصد الشريعة الإسلامية",
-    author: "د. أحمد الريسوني",
-    category: "أصول الفقه",
+    title: "Objectives of Islamic Sharia (Maqasid al-Sharia)",
+    author: "Dr. Ahmad Al-Raysuni",
+    category: "Principles of Jurisprudence",
     downloads: 39000,
     publishedYear: 2022,
     pages: 380,
-    language: "العربية",
+    language: "Arabic",
     isbn: "978-0-864209-75-3",
-    description: "دراسة معاصرة لمقاصد الشريعة الإسلامية وتطبيقاتها في الفقه المعاصر، مع التركيز على المرونة والثبات في الشريعة.",
+    description: "A contemporary study of the objectives of Islamic Sharia and their applications in contemporary jurisprudence, focusing on flexibility and constancy in Sharia.",
     coverImage: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=600&fit=crop",
-    tags: ["مقاصد الشريعة", "أصول الفقه", "الفقه المعاصر"]
+    tags: ["Sharia Objectives", "Principles of Jurisprudence", "Contemporary Jurisprudence"]
   }
 ];
 
@@ -215,7 +215,7 @@ class LibraryService {
             user: { id: 1, username: 'admin', role: 'administrator' }
           });
         } else {
-          reject(new Error('بيانات الدخول غير صحيحة'));
+          reject(new Error('Invalid login credentials'));
         }
       }, 1200);
     });
@@ -234,21 +234,21 @@ class LibraryService {
         recentActivity: [
           {
             type: 'download',
-            title: 'تحميل كتاب جديد',
-            description: 'قام أحمد محمد بتحميل كتاب "فقه الزكاة"',
-            time: 'منذ 5 دقائق'
+            title: 'New book download',
+            description: 'Ahmad Muhammad downloaded "Fiqh of Zakat"',
+            time: '5 minutes ago'
           },
           {
             type: 'user',
-            title: 'مستخدم جديد',
-            description: 'انضم فاطمة علي إلى المنصة',
-            time: 'منذ 15 دقيقة'
+            title: 'New user',
+            description: 'Fatima Ali joined the platform',
+            time: '15 minutes ago'
           },
           {
             type: 'book',
-            title: 'إضافة كتاب',
-            description: 'تم إضافة كتاب "السيرة النبوية المعاصرة"',
-            time: 'منذ ساعة'
+            title: 'Book added',
+            description: 'Added book "Contemporary Prophetic Biography"',
+            time: '1 hour ago'
           }
         ]
       }), 800);
@@ -262,7 +262,7 @@ class LibraryService {
       setTimeout(() => resolve([
         {
           id: 1,
-          name: 'أحمد محمد علي',
+          name: 'Ahmad Muhammad Ali',
           email: 'ahmed.mohamed@example.com',
           joinDate: '2024-01-15',
           lastActive: '2024-05-20',
@@ -270,16 +270,16 @@ class LibraryService {
           isPremium: true,
           totalDownloads: 45,
           monthlyDownloads: 12,
-          favoriteCategory: 'علوم القرآن',
+          favoriteCategory: 'Quranic Sciences',
           recentDownloads: [
-            { bookTitle: 'فقه الزكاة', date: '2024-05-19' },
-            { bookTitle: 'السيرة النبوية', date: '2024-05-18' },
-            { bookTitle: 'أصول الفقه', date: '2024-05-17' }
+            { bookTitle: 'Fiqh of Zakat', date: '2024-05-19' },
+            { bookTitle: 'Prophetic Biography', date: '2024-05-18' },
+            { bookTitle: 'Principles of Jurisprudence', date: '2024-05-17' }
           ]
         },
         {
           id: 2,
-          name: 'فاطمة عبد الرحمن',
+          name: 'Fatima Abdul Rahman',
           email: 'fatima.abdelrahman@example.com',
           joinDate: '2024-02-20',
           lastActive: '2024-05-21',
@@ -287,15 +287,15 @@ class LibraryService {
           isPremium: false,
           totalDownloads: 23,
           monthlyDownloads: 8,
-          favoriteCategory: 'الحديث الشريف',
+          favoriteCategory: 'Prophetic Traditions',
           recentDownloads: [
-            { bookTitle: 'صحيح البخاري', date: '2024-05-20' },
-            { bookTitle: 'رياض الصالحين', date: '2024-05-19' }
+            { bookTitle: 'Sahih Bukhari', date: '2024-05-20' },
+            { bookTitle: 'Riyadh as-Salihin', date: '2024-05-19' }
           ]
         },
         {
           id: 3,
-          name: 'يوسف الأحمد',
+          name: 'Yusuf Al-Ahmad',
           email: 'yusuf.ahmad@example.com',
           joinDate: '2024-03-10',
           lastActive: '2024-05-15',
@@ -303,14 +303,14 @@ class LibraryService {
           isPremium: false,
           totalDownloads: 8,
           monthlyDownloads: 2,
-          favoriteCategory: 'التفسير',
+          favoriteCategory: 'Quranic Exegesis',
           recentDownloads: [
-            { bookTitle: 'تفسير ابن كثير', date: '2024-05-10' }
+            { bookTitle: 'Tafsir Ibn Kathir', date: '2024-05-10' }
           ]
         },
         {
           id: 4,
-          name: 'عائشة السالم',
+          name: 'Aisha Al-Salem',
           email: 'aisha.salem@example.com',
           joinDate: '2024-04-05',
           lastActive: '2024-05-22',
@@ -318,16 +318,16 @@ class LibraryService {
           isPremium: true,
           totalDownloads: 67,
           monthlyDownloads: 25,
-          favoriteCategory: 'الفقه الإسلامي',
+          favoriteCategory: 'Islamic Jurisprudence',
           recentDownloads: [
-            { bookTitle: 'المغني لابن قدامة', date: '2024-05-22' },
-            { bookTitle: 'الموطأ للإمام مالك', date: '2024-05-21' },
-            { bookTitle: 'فتح الباري', date: '2024-05-20' }
+            { bookTitle: 'Al-Mughni by Ibn Qudamah', date: '2024-05-22' },
+            { bookTitle: 'Al-Muwatta by Imam Malik', date: '2024-05-21' },
+            { bookTitle: 'Fath al-Bari', date: '2024-05-20' }
           ]
         },
         {
           id: 5,
-          name: 'محمد الشريف',
+          name: 'Muhammad Al-Sharif',
           email: 'mohammed.sharif@example.com',
           joinDate: '2024-01-30',
           lastActive: '2024-05-23',
@@ -335,10 +335,10 @@ class LibraryService {
           isPremium: false,
           totalDownloads: 34,
           monthlyDownloads: 15,
-          favoriteCategory: 'السيرة النبوية',
+          favoriteCategory: 'Prophetic Biography',
           recentDownloads: [
-            { bookTitle: 'الرحيق المختوم', date: '2024-05-23' },
-            { bookTitle: 'زاد المعاد', date: '2024-05-22' }
+            { bookTitle: 'Ar-Raheeq Al-Makhtum', date: '2024-05-23' },
+            { bookTitle: 'Zad al-Ma\'ad', date: '2024-05-22' }
           ]
         }
       ]), 600);
@@ -366,7 +366,7 @@ class LibraryService {
       setTimeout(() => resolve({ 
         success: true, 
         id: Date.now(),
-        message: 'تم إضافة العالم بنجاح'
+        message: 'Scholar added successfully'
       }), 1000);
     });
   }
@@ -382,7 +382,7 @@ class LibraryService {
       setTimeout(() => resolve({ 
         success: true, 
         id: Date.now(),
-        message: 'تم إضافة الكتاب بنجاح'
+        message: 'Book added successfully'
       }), 1000);
     });
   }
@@ -397,9 +397,9 @@ export default LibraryService;
 export const DataUtils = {
   formatDownloadCount: (count) => {
     if (count >= 1000000) {
-      return `${(count / 1000000).toFixed(1)}م`;
+      return `${(count / 1000000).toFixed(1)}M`;
     } else if (count >= 1000) {
-      return `${(count / 1000).toFixed(1)}ك`;
+      return `${(count / 1000).toFixed(1)}K`;
     }
     return count.toString();
   },
@@ -424,16 +424,16 @@ export const DataUtils = {
 
   getIslamicCategories: () => {
     return [
-      "علوم القرآن",
-      "الحديث الشريف", 
-      "الفقه الإسلامي",
-      "العقيدة الإسلامية",
-      "السيرة النبوية",
-      "التاريخ الإسلامي",
-      "الاقتصاد الإسلامي",
-      "التربية الإسلامية",
-      "الأخلاق الإسلامية",
-      "الدعوة الإسلامية"
+      "Quranic Sciences",
+      "Prophetic Traditions", 
+      "Islamic Jurisprudence",
+      "Islamic Creed",
+      "Prophetic Biography",
+      "Islamic History",
+      "Islamic Economics",
+      "Islamic Education",
+      "Islamic Ethics",
+      "Islamic Da'wah"
     ];
   },
 

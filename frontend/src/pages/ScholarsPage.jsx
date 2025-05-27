@@ -90,7 +90,7 @@ const ScholarsPage = () => {
               className="absolute inset-2 border-4 border-emerald-600 border-t-transparent rounded-full"
             ></motion.div>
           </div>
-          <p className="text-xl text-emerald-800 font-medium">جاري تحميل العلماء...</p>
+          <p className="text-xl text-emerald-800 font-medium">Loading scholars...</p>
         </motion.div>
       </div>
     );
@@ -113,15 +113,15 @@ const ScholarsPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-emerald-800 mb-4" dir="rtl">
-            جميع العلماء
+          <h1 className="text-4xl md:text-5xl font-bold text-emerald-800 mb-4">
+            All Scholars
           </h1>
           <h2 className="text-2xl md:text-3xl font-semibold text-emerald-700 mb-6">
-            All Islamic Scholars
+            Islamic Scholars Directory
           </h2>
           <div className="w-32 h-1 bg-gradient-to-r from-emerald-600 to-green-600 mx-auto mb-8 rounded-full"></div>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            اكتشف علماءنا المرموقين وأعمالهم المؤثرة في الفكر الإسلامي المعاصر
+            Discover our distinguished scholars and their influential works in contemporary Islamic thought
           </p>
         </motion.div>
 
@@ -140,11 +140,10 @@ const ScholarsPage = () => {
               </svg>
               <input
                 type="text"
-                placeholder="ابحث عن عالم..."
+                placeholder="Search for a scholar..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
-                dir="rtl"
               />
             </div>
 
@@ -154,7 +153,7 @@ const ScholarsPage = () => {
               onChange={(e) => setSelectedSpecialization(e.target.value)}
               className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
-              <option value="all">جميع التخصصات</option>
+              <option value="all">All Specializations</option>
               {specializations.map(spec => (
                 <option key={spec} value={spec}>{spec}</option>
               ))}
@@ -166,9 +165,9 @@ const ScholarsPage = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
-              <option value="name">ترتيب حسب الاسم</option>
-              <option value="works">ترتيب حسب عدد الأعمال</option>
-              <option value="institution">ترتيب حسب المؤسسة</option>
+              <option value="name">Sort by Name</option>
+              <option value="works">Sort by Number of Works</option>
+              <option value="institution">Sort by Institution</option>
             </select>
           </div>
         </motion.div>
@@ -181,7 +180,7 @@ const ScholarsPage = () => {
           className="text-center mb-8"
         >
           <p className="text-emerald-700 font-medium">
-            تم العثور على {filteredScholars.length} عالم من أصل {scholars.length}
+            Found {filteredScholars.length} scholars out of {scholars.length}
           </p>
         </motion.div>
 
@@ -215,13 +214,13 @@ const ScholarsPage = () => {
                 
                 {/* Works count badge */}
                 <div className="absolute top-4 right-4 bg-emerald-600 text-white rounded-xl px-3 py-2">
-                  <span className="text-sm font-bold">{scholar.worksCount} عمل</span>
+                  <span className="text-sm font-bold">{scholar.worksCount} works</span>
                 </div>
 
                 {/* View works button */}
                 <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
                   <button className="w-full bg-white/95 backdrop-blur-sm text-emerald-800 py-2 px-4 rounded-xl font-semibold hover:bg-white transition-colors duration-200">
-                    عرض الأعمال
+                    View Works
                   </button>
                 </div>
               </div>
@@ -261,8 +260,8 @@ const ScholarsPage = () => {
             <svg className="w-16 h-16 text-emerald-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.64-4.75-3.835M6 20.341V9.5a3.5 3.5 0 117 0v1.341m4 0V9.5a3.5 3.5 0 117 0v10.841" />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">لا توجد نتائج</h3>
-            <p className="text-gray-500">جرب تعديل معايير البحث</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">No results found</h3>
+            <p className="text-gray-500">Try adjusting your search criteria</p>
           </motion.div>
         )}
       </div>
@@ -311,14 +310,14 @@ const ScholarsPage = () => {
 
               {/* Modal Content */}
               <div className="p-6 overflow-y-auto max-h-96">
-                <h4 className="text-xl font-bold text-emerald-800 mb-6" dir="rtl">
-                  أعمال {selectedScholar.name}
+                <h4 className="text-xl font-bold text-emerald-800 mb-6">
+                  Works by {selectedScholar.name}
                 </h4>
 
                 {loadingWorks ? (
                   <div className="flex items-center justify-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-                    <span className="mr-3 text-emerald-700">جاري تحميل الأعمال...</span>
+                    <span className="ml-3 text-emerald-700">Loading works...</span>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -329,13 +328,13 @@ const ScholarsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100 hover:border-emerald-200 transition-colors duration-200"
                       >
-                        <h5 className="font-bold text-gray-900 mb-2" dir="rtl">{work.title}</h5>
+                        <h5 className="font-bold text-gray-900 mb-2">{work.title}</h5>
                         <div className="flex items-center justify-between text-sm text-gray-600">
                           <span className="flex items-center gap-1">
                             <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                             </svg>
-                            {work.downloads.toLocaleString()} تحميل
+                            {work.downloads.toLocaleString()} downloads
                           </span>
                           <span>{work.year}</span>
                         </div>
@@ -346,7 +345,7 @@ const ScholarsPage = () => {
 
                 {!loadingWorks && scholarWorks.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-gray-500">لا توجد أعمال متاحة حالياً</p>
+                    <p className="text-gray-500">No works available currently</p>
                   </div>
                 )}
               </div>
