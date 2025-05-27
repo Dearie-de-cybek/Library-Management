@@ -73,7 +73,10 @@ const UserManagement = () => {
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold">تفاصيل المستخدم</h3>
+            <div>
+              <h3 className="text-2xl font-bold">User Details</h3>
+              <p className="text-emerald-100 text-sm" dir="rtl">تفاصيل المستخدم</p>
+            </div>
             <button
               onClick={onClose}
               className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors duration-200"
@@ -104,68 +107,89 @@ const UserManagement = () => {
 
               <div className="space-y-4">
                 <div>
-                  <span className="text-gray-600 text-sm">تاريخ الانضمام:</span>
-                  <p className="font-semibold">{new Date(user.joinDate).toLocaleDateString('ar-SA')}</p>
+                  <span className="text-gray-900 font-semibold">Join Date</span>
+                  <span className="text-gray-500 text-sm ml-2" dir="rtl">تاريخ الانضمام</span>
+                  <p className="font-semibold text-gray-700">{new Date(user.joinDate).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600 text-sm">آخر نشاط:</span>
-                  <p className="font-semibold">{new Date(user.lastActive).toLocaleDateString('ar-SA')}</p>
+                  <span className="text-gray-900 font-semibold">Last Active</span>
+                  <span className="text-gray-500 text-sm ml-2" dir="rtl">آخر نشاط</span>
+                  <p className="font-semibold text-gray-700">{new Date(user.lastActive).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <span className="text-gray-600 text-sm">الحالة:</span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {user.status === 'active' ? 'نشط' : 'غير نشط'}
-                  </span>
+                  <span className="text-gray-900 font-semibold">Status</span>
+                  <span className="text-gray-500 text-sm ml-2" dir="rtl">الحالة</span>
+                  <div className="mt-1">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {user.status === 'active' ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
                 </div>
                 <div>
-                  <span className="text-gray-600 text-sm">النوع:</span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    user.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {user.isPremium ? 'مميز' : 'عادي'}
-                  </span>
+                  <span className="text-gray-900 font-semibold">Account Type</span>
+                  <span className="text-gray-500 text-sm ml-2" dir="rtl">النوع</span>
+                  <div className="mt-1">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      user.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {user.isPremium ? 'Premium' : 'Standard'}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Download Stats */}
             <div>
-              <h5 className="font-bold text-gray-900 mb-4">إحصائيات التحميل</h5>
+              <div className="flex items-center gap-2 mb-4">
+                <h5 className="font-bold text-gray-900">Download Statistics</h5>
+                <span className="text-gray-500 text-sm" dir="rtl">إحصائيات التحميل</span>
+              </div>
               <div className="space-y-4">
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
                   <div className="text-center">
                     <p className="text-3xl font-bold text-emerald-600">{user.totalDownloads}</p>
-                    <p className="text-emerald-700 text-sm">إجمالي التحميلات</p>
+                    <p className="text-emerald-700 text-sm font-semibold">Total Downloads</p>
+                    <p className="text-emerald-600 text-xs" dir="rtl">إجمالي التحميلات</p>
                   </div>
                 </div>
                 
                 <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-blue-600">{user.monthlyDownloads}</p>
-                    <p className="text-blue-700 text-sm">تحميلات هذا الشهر</p>
+                    <p className="text-blue-700 text-sm font-semibold">This Month</p>
+                    <p className="text-blue-600 text-xs" dir="rtl">هذا الشهر</p>
                   </div>
                 </div>
 
                 <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-purple-600">{user.favoriteCategory}</p>
-                    <p className="text-purple-700 text-sm">التصنيف المفضل</p>
+                    <p className="text-purple-700 text-sm font-semibold">Favorite Category</p>
+                    <p className="text-purple-600 text-xs" dir="rtl">التصنيف المفضل</p>
                   </div>
                 </div>
               </div>
 
               {/* Recent Downloads */}
               <div className="mt-6">
-                <h6 className="font-semibold text-gray-900 mb-3">آخر التحميلات</h6>
+                <div className="flex items-center gap-2 mb-3">
+                  <h6 className="font-semibold text-gray-900">Recent Downloads</h6>
+                  <span className="text-gray-500 text-xs" dir="rtl">آخر التحميلات</span>
+                </div>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {user.recentDownloads.map((download, index) => (
-                    <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-700">{download.bookTitle}</span>
-                      <span className="text-xs text-gray-500">{download.date}</span>
-                    </div>
-                  ))}
+                  {user.recentDownloads && user.recentDownloads.length > 0 ? (
+                    user.recentDownloads.map((download, index) => (
+                      <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-700">{download.bookTitle}</span>
+                        <span className="text-xs text-gray-500">{download.date}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm text-center py-4">No recent downloads</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -181,7 +205,7 @@ const UserManagement = () => {
                   : 'bg-green-600 text-white hover:bg-green-700'
               }`}
             >
-              {user.status === 'active' ? 'إلغاء التفعيل' : 'تفعيل الحساب'}
+              {user.status === 'active' ? 'Deactivate User' : 'Activate User'}
             </button>
             <button
               onClick={() => handleUserAction(user.id, user.isPremium ? 'removePremium' : 'makePremium')}
@@ -191,7 +215,7 @@ const UserManagement = () => {
                   : 'bg-amber-600 text-white hover:bg-amber-700'
               }`}
             >
-              {user.isPremium ? 'إزالة المميز' : 'جعل مميز'}
+              {user.isPremium ? 'Remove Premium' : 'Make Premium'}
             </button>
           </div>
         </div>
@@ -203,7 +227,8 @@ const UserManagement = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-        <span className="mr-3 text-emerald-700">جاري تحميل المستخدمين...</span>
+        <span className="ml-3 text-emerald-700">Loading users...</span>
+        <span className="mr-3 text-emerald-600 text-sm" dir="rtl">جاري تحميل المستخدمين</span>
       </div>
     );
   }
@@ -216,7 +241,10 @@ const UserManagement = () => {
     >
       {/* Header */}
       <div className="bg-white rounded-3xl p-6 shadow-lg border border-emerald-100">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6" dir="rtl">إدارة المستخدمين</h2>
+        <div className="flex items-center gap-3 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
+          <span className="text-gray-500" dir="rtl">إدارة المستخدمين</span>
+        </div>
         
         {/* Controls */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -227,11 +255,10 @@ const UserManagement = () => {
             </svg>
             <input
               type="text"
-              placeholder="ابحث عن مستخدم..."
+              placeholder="Search for users..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              dir="rtl"
             />
           </div>
 
@@ -241,10 +268,10 @@ const UserManagement = () => {
             onChange={(e) => setFilterBy(e.target.value)}
             className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
-            <option value="all">جميع المستخدمين</option>
-            <option value="active">المستخدمون النشطون</option>
-            <option value="inactive">المستخدمون غير النشطين</option>
-            <option value="premium">المستخدمون المميزون</option>
+            <option value="all">All Users</option>
+            <option value="active">Active Users</option>
+            <option value="inactive">Inactive Users</option>
+            <option value="premium">Premium Users</option>
           </select>
 
           {/* Sort */}
@@ -253,10 +280,10 @@ const UserManagement = () => {
             onChange={(e) => setSortBy(e.target.value)}
             className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
-            <option value="joinDate">ترتيب حسب تاريخ الانضمام</option>
-            <option value="name">ترتيب حسب الاسم</option>
-            <option value="downloads">ترتيب حسب التحميلات</option>
-            <option value="lastActive">ترتيب حسب آخر نشاط</option>
+            <option value="joinDate">Sort by Join Date</option>
+            <option value="name">Sort by Name</option>
+            <option value="downloads">Sort by Downloads</option>
+            <option value="lastActive">Sort by Last Active</option>
           </select>
         </div>
       </div>
@@ -267,13 +294,48 @@ const UserManagement = () => {
           <table className="w-full">
             <thead className="bg-emerald-50 border-b border-emerald-100">
               <tr>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">المستخدم</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">تاريخ الانضمام</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">إجمالي التحميلات</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">هذا الشهر</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">الحالة</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">النوع</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-emerald-800">الإجراءات</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>User</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">المستخدم</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>Join Date</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">تاريخ الانضمام</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>Total Downloads</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">إجمالي التحميلات</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>This Month</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">هذا الشهر</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>Status</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">الحالة</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>Type</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">النوع</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                  <div className="flex flex-col">
+                    <span>Actions</span>
+                    <span className="text-xs text-emerald-600" dir="rtl">الإجراءات</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -299,7 +361,7 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-gray-700">
-                    {new Date(user.joinDate).toLocaleDateString('ar-SA')}
+                    {new Date(user.joinDate).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
                     <div className="font-bold text-emerald-600">{user.totalDownloads}</div>
@@ -311,14 +373,14 @@ const UserManagement = () => {
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                     }`}>
-                      {user.status === 'active' ? 'نشط' : 'غير نشط'}
+                      {user.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       user.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {user.isPremium ? 'مميز' : 'عادي'}
+                      {user.isPremium ? 'Premium' : 'Standard'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -326,7 +388,7 @@ const UserManagement = () => {
                       onClick={() => setSelectedUser(user)}
                       className="text-emerald-600 hover:text-emerald-800 font-semibold text-sm hover:underline"
                     >
-                      عرض التفاصيل
+                      View Details
                     </button>
                   </td>
                 </motion.tr>
@@ -338,7 +400,8 @@ const UserManagement = () => {
 
       {/* Results Count */}
       <div className="text-center text-gray-600">
-        عرض {filteredUsers.length} من أصل {users.length} مستخدم
+        <span>Showing {filteredUsers.length} of {users.length} users</span>
+        <span className="text-gray-500 text-sm ml-3" dir="rtl">عرض {filteredUsers.length} من أصل {users.length} مستخدم</span>
       </div>
 
       {/* User Detail Modal */}
