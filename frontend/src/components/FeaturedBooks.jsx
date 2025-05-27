@@ -109,11 +109,15 @@ const FeaturedBooks = ({ books }) => {
                   <span className="bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 px-4 py-2 rounded-full text-xs font-bold border border-emerald-200">
                     {book.category}
                   </span>
-                  <div className="flex items-center gap-1 text-gray-500 text-xs">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
-                    </svg>
-                    <span>{book.pages} صفحة</span>
+                  {/* Bilingual pages indicator */}
+                  <div className="flex flex-col items-center gap-1 text-gray-500 text-xs">
+                    <div className="flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clipRule="evenodd" />
+                      </svg>
+                      <span dir="rtl">{book.pages} صفحة</span>
+                    </div>
+                    <span className="text-gray-400">{book.pages} pages</span>
                   </div>
                 </div>
                 
@@ -141,15 +145,19 @@ const FeaturedBooks = ({ books }) => {
                     ))}
                   </div>
                   
+                  {/* Bilingual button */}
                   <motion.button
                     whileHover={{ x: 3 }}
-                    className="group/btn text-emerald-700 hover:text-emerald-900 flex items-center gap-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200"
+                    className="group/btn text-emerald-700 hover:text-emerald-900 flex flex-col items-center gap-1 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded-lg p-2 transition-colors duration-200"
                     aria-label={`View details for ${book.title}`}
                   >
-                    <span>عرض التفاصيل</span>
-                    <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <div className="flex items-center gap-2">
+                      <span dir="rtl">عرض التفاصيل</span>
+                      <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                    <span className="text-xs text-emerald-600">View Details</span>
                   </motion.button>
                 </div>
               </div>

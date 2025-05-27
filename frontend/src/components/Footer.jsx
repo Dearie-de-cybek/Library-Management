@@ -1,9 +1,63 @@
-/* eslint-disable no-unused-vars */
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const [language, setLanguage] = useState('ar'); // 'ar' for Arabic, 'en' for English
+
+  const translations = {
+    ar: {
+      title: 'المكتبة الإسلامية',
+      subtitle: 'Islamic Digital Library',
+      description: 'تمكين التميز الأكاديمي من خلال الأعمال العلمية الإسلامية المنتقاة والبحوث من علماء مرموقين حول العالم.',
+      quickLinks: 'روابط سريعة',
+      resources: 'الموارد',
+      copyright: `© ${currentYear} المكتبة الإسلامية. جميع الحقوق محفوظة.`,
+      builtWith: 'مبني بإمكانية الوصول والقيم الإسلامية في الاعتبار.',
+      poweredBy: 'مدعوم بالمعرفة الإسلامية',
+      links: {
+        browse: 'تصفح الكتب',
+        scholars: 'العلماء',
+        categories: 'التصنيفات',
+        about: 'من نحن',
+        contact: 'اتصل بنا',
+        help: 'مركز المساعدة',
+        terms: 'شروط الخدمة',
+        privacy: 'سياسة الخصوصية',
+        accessibility: 'إمكانية الوصول',
+        api: 'واجهة برمجة التطبيقات'
+      }
+    },
+    en: {
+      title: 'Islamic Library',
+      subtitle: 'المكتبة الإسلامية',
+      description: 'Empowering academic excellence through curated Islamic scholarly works and research from distinguished scholars worldwide.',
+      quickLinks: 'Quick Links',
+      resources: 'Resources',
+      copyright: `© ${currentYear} Islamic Library. All rights reserved.`,
+      builtWith: 'Built with accessibility and Islamic values in mind.',
+      poweredBy: 'Powered by Islamic Knowledge',
+      links: {
+        browse: 'Browse Books',
+        scholars: 'Scholars',
+        categories: 'Categories',
+        about: 'About Us',
+        contact: 'Contact',
+        help: 'Help Center',
+        terms: 'Terms of Service',
+        privacy: 'Privacy Policy',
+        accessibility: 'Accessibility',
+        api: 'API Documentation'
+      }
+    }
+  };
+
+  const currentLang = translations[language];
+  const isRTL = language === 'ar';
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'ar' ? 'en' : 'ar');
+  };
 
   return (
     <footer className="relative bg-gradient-to-br from-emerald-900 via-emerald-800 to-green-900 text-white overflow-hidden">
@@ -23,7 +77,22 @@ const Footer = () => {
         }}></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      {/* Language Toggle Button */}
+      <div className="absolute top-4 right-4 z-20">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleLanguage}
+          className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg px-3 py-2 text-sm text-white hover:bg-white/20 transition-all duration-200"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+          </svg>
+          <span>{language === 'ar' ? 'EN' : 'ع'}</span>
+        </motion.button>
+      </div>
+
+      <div className={`relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
@@ -34,27 +103,30 @@ const Footer = () => {
               transition={{ duration: 0.6 }}
               className="flex flex-col items-center md:items-start"
             >
-              <div className="flex items-center space-x-3 mb-6">
+              <div className={`flex items-center mb-6 ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
                 <div className="w-12 h-12 bg-white/15 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10">
                   <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white" dir="rtl">المكتبة الإسلامية</h3>
-                  <p className="text-emerald-200 text-sm">Islamic Digital Library</p>
+                  <h3 className="text-2xl font-bold text-white">{currentLang.title}</h3>
+                  <p className="text-emerald-200 text-sm">{currentLang.subtitle}</p>
                 </div>
               </div>
               
               <p className="text-emerald-100 mb-6 max-w-md leading-relaxed text-center md:text-left">
-                تمكين التميز الأكاديمي من خلال الأعمال العلمية الإسلامية المنتقاة والبحوث من علماء مرموقين حول العالم.
+                {currentLang.description}
               </p>
               
-              <p className="text-emerald-200 mb-8 max-w-md leading-relaxed text-sm text-center md:text-left">
-                Empowering academic excellence through curated Islamic scholarly works and research from distinguished scholars worldwide.
-              </p>
+              {/* Show both languages for broader understanding */}
+              {language === 'en' && (
+                <p className="text-emerald-200 mb-8 max-w-md leading-relaxed text-sm text-center md:text-left opacity-75">
+                  {translations.ar.description}
+                </p>
+              )}
               
-              <div className="flex space-x-6">
+              <div className={`flex ${isRTL ? 'space-x-reverse space-x-6' : 'space-x-6'}`}>
                 <motion.a
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.9 }}
@@ -113,25 +185,19 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <h4 className="text-lg font-bold mb-6 text-white">روابط سريعة</h4>
+            <h4 className="text-lg font-bold mb-6 text-white">{currentLang.quickLinks}</h4>
             <ul className="space-y-3">
-              {[
-                { ar: 'تصفح الكتب', en: 'Browse Books' },
-                { ar: 'العلماء', en: 'Scholars' },
-                { ar: 'التصنيفات', en: 'Categories' },
-                { ar: 'من نحن', en: 'About Us' },
-                { ar: 'اتصل بنا', en: 'Contact' }
-              ].map((link, index) => (
+              {Object.entries(currentLang.links).slice(0, 5).map(([key, link], index) => (
                 <li key={index}>
                   <motion.a
-                    whileHover={{ x: 5 }}
+                    whileHover={{ x: isRTL ? -5 : 5 }}
                     href="#"
-                    className="group text-emerald-200 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-emerald-900 rounded-md p-1 flex items-center gap-2"
+                    className={`group text-emerald-200 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-emerald-900 rounded-md p-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    <span className="text-sm">{link.ar}</span>
+                    <span className="text-sm">{link}</span>
                   </motion.a>
                 </li>
               ))}
@@ -145,25 +211,19 @@ const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <h4 className="text-lg font-bold mb-6 text-white">الموارد</h4>
+            <h4 className="text-lg font-bold mb-6 text-white">{currentLang.resources}</h4>
             <ul className="space-y-3">
-              {[
-                { ar: 'مركز المساعدة', en: 'Help Center' },
-                { ar: 'شروط الخدمة', en: 'Terms of Service' },
-                { ar: 'سياسة الخصوصية', en: 'Privacy Policy' },
-                { ar: 'إمكانية الوصول', en: 'Accessibility' },
-                { ar: 'واجهة برمجة التطبيقات', en: 'API Docs' }
-              ].map((link, index) => (
+              {Object.entries(currentLang.links).slice(5).map(([key, link], index) => (
                 <li key={index}>
                   <motion.a
-                    whileHover={{ x: 5 }}
+                    whileHover={{ x: isRTL ? -5 : 5 }}
                     href="#"
-                    className="group text-emerald-200 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-emerald-900 rounded-md p-1 flex items-center gap-2"
+                    className={`group text-emerald-200 hover:text-white transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-emerald-900 rounded-md p-1 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                   >
-                    <svg className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isRTL ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                    <span className="text-sm">{link.ar}</span>
+                    <span className="text-sm">{link}</span>
                   </motion.a>
                 </li>
               ))}
@@ -179,19 +239,19 @@ const Footer = () => {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="border-t border-emerald-700/50 mt-16 pt-8"
         >
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className={`flex flex-col md:flex-row justify-between items-center gap-4 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
             <div className="text-center md:text-left">
-              <p className="text-emerald-200 text-sm mb-1" dir="rtl">
-                © {currentYear} المكتبة الإسلامية. جميع الحقوق محفوظة.
+              <p className="text-emerald-200 text-sm mb-1">
+                {currentLang.copyright}
               </p>
               <p className="text-emerald-300 text-xs">
-                Built with accessibility and Islamic values in mind.
+                {currentLang.builtWith}
               </p>
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="flex items-center gap-2 text-emerald-200 text-sm">
-                <span>مدعوم بالمعرفة الإسلامية</span>
+              <div className={`flex items-center gap-2 text-emerald-200 text-sm ${isRTL ? 'flex-row-reverse' : ''}`}>
+                <span>{currentLang.poweredBy}</span>
                 <motion.div 
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
