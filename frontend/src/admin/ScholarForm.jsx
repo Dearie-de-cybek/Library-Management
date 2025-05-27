@@ -20,21 +20,21 @@ const ScholarForm = ({ onSuccess }) => {
   const [errors, setErrors] = useState({});
 
   const specializations = [
-    'الفقه الإسلامي',
-    'علوم القرآن',
-    'الحديث الشريف',
-    'العقيدة الإسلامية',
-    'السيرة النبوية',
-    'التاريخ الإسلامي',
-    'التفسير',
-    'أصول الفقه',
-    'الدعوة الإسلامية',
-    'الأخلاق الإسلامية',
-    'التربية الإسلامية',
-    'الاقتصاد الإسلامي',
-    'الفلسفة الإسلامية',
-    'التصوف',
-    'المقاصد الشرعية'
+    'Islamic Jurisprudence (Fiqh)',
+    'Quranic Sciences',
+    'Hadith Studies',
+    'Islamic Theology (Aqeedah)',
+    'Prophet\'s Biography (Seerah)',
+    'Islamic History',
+    'Quranic Exegesis (Tafsir)',
+    'Principles of Jurisprudence (Usul al-Fiqh)',
+    'Islamic Da\'wah',
+    'Islamic Ethics',
+    'Islamic Education',
+    'Islamic Economics',
+    'Islamic Philosophy',
+    'Islamic Mysticism (Sufism)',
+    'Objectives of Sharia (Maqasid)'
   ];
 
   const handleInputChange = (e) => {
@@ -71,22 +71,22 @@ const ScholarForm = ({ onSuccess }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) newErrors.name = 'اسم العالم مطلوب';
-    if (!formData.title.trim()) newErrors.title = 'لقب العالم مطلوب';
-    if (!formData.specialization) newErrors.specialization = 'التخصص مطلوب';
-    if (!formData.bio.trim()) newErrors.bio = 'نبذة عن العالم مطلوبة';
-    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'تاريخ الميلاد مطلوب';
+    if (!formData.name.trim()) newErrors.name = 'Scholar name is required';
+    if (!formData.title.trim()) newErrors.title = 'Scholar title is required';
+    if (!formData.specialization) newErrors.specialization = 'Specialization is required';
+    if (!formData.bio.trim()) newErrors.bio = 'Scholar biography is required';
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required';
     if (!formData.isAlive && !formData.dateOfDeath) {
-      newErrors.dateOfDeath = 'تاريخ الوفاة مطلوب للعالم المتوفي';
+      newErrors.dateOfDeath = 'Date of death is required for deceased scholars';
     }
 
     // Validate works
     formData.works.forEach((work, index) => {
       if (!work.title.trim()) {
-        newErrors[`work_title_${index}`] = `عنوان العمل ${index + 1} مطلوب`;
+        newErrors[`work_title_${index}`] = `Work title ${index + 1} is required`;
       }
       if (!work.year) {
-        newErrors[`work_year_${index}`] = `سنة النشر للعمل ${index + 1} مطلوبة`;
+        newErrors[`work_year_${index}`] = `Publication year for work ${index + 1} is required`;
       }
     });
 
@@ -115,10 +115,10 @@ const ScholarForm = ({ onSuccess }) => {
       });
       setErrors({});
       onSuccess && onSuccess();
-      alert('تم إضافة العالم بنجاح!');
+      alert('Scholar added successfully!');
     } catch (error) {
       console.error('Error creating scholar:', error);
-      alert('حدث خطأ في إضافة العالم');
+      alert('Error occurred while adding scholar');
     } finally {
       setLoading(false);
     }
@@ -133,8 +133,8 @@ const ScholarForm = ({ onSuccess }) => {
       <div className="bg-white rounded-3xl shadow-lg border border-emerald-100 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6">
-          <h2 className="text-2xl font-bold mb-2" dir="rtl">إضافة عالم جديد</h2>
-          <p className="text-emerald-100">Add New Islamic Scholar</p>
+          <h2 className="text-2xl font-bold mb-2">Add New Islamic Scholar</h2>
+          <p className="text-emerald-100">Register a new scholar in the Islamic library</p>
         </div>
 
         {/* Form */}
@@ -143,8 +143,8 @@ const ScholarForm = ({ onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Scholar Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                اسم العالم *
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Scholar Name *
               </label>
               <input
                 type="text"
@@ -154,16 +154,15 @@ const ScholarForm = ({ onSuccess }) => {
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.name ? 'border-red-500' : 'border-emerald-200'
                 }`}
-                placeholder="مثال: د. يوسف القرضاوي"
-                dir="rtl"
+                placeholder="e.g., Dr. Yusuf al-Qaradawi"
               />
               {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
             {/* Title */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                اللقب الأكاديمي *
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Academic Title *
               </label>
               <input
                 type="text"
@@ -173,16 +172,15 @@ const ScholarForm = ({ onSuccess }) => {
                 className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.title ? 'border-red-500' : 'border-emerald-200'
                 }`}
-                placeholder="مثال: عالم وفقيه معاصر"
-                dir="rtl"
+                placeholder="e.g., Contemporary Islamic Scholar and Jurist"
               />
               {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
             </div>
 
             {/* Institution */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                المؤسسة / الجامعة
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Institution / University
               </label>
               <input
                 type="text"
@@ -190,15 +188,14 @@ const ScholarForm = ({ onSuccess }) => {
                 value={formData.institution}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                placeholder="مثال: الأزهر الشريف"
-                dir="rtl"
+                placeholder="e.g., Al-Azhar University"
               />
             </div>
 
             {/* Specialization */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                التخصص *
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Specialization *
               </label>
               <select
                 name="specialization"
@@ -208,7 +205,7 @@ const ScholarForm = ({ onSuccess }) => {
                   errors.specialization ? 'border-red-500' : 'border-emerald-200'
                 }`}
               >
-                <option value="">اختر التخصص</option>
+                <option value="">Select Specialization</option>
                 {specializations.map((spec) => (
                   <option key={spec} value={spec}>{spec}</option>
                 ))}
@@ -219,8 +216,8 @@ const ScholarForm = ({ onSuccess }) => {
 
           {/* Biography */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-              نبذة عن العالم *
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Biography *
             </label>
             <textarea
               name="bio"
@@ -230,8 +227,7 @@ const ScholarForm = ({ onSuccess }) => {
               className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                 errors.bio ? 'border-red-500' : 'border-emerald-200'
               }`}
-              placeholder="اكتب نبذة شاملة عن العالم وإسهاماته في العلوم الإسلامية..."
-              dir="rtl"
+              placeholder="Write a comprehensive biography about the scholar and their contributions to Islamic sciences..."
             />
             {errors.bio && <p className="text-red-500 text-sm mt-1">{errors.bio}</p>}
           </div>
@@ -240,8 +236,8 @@ const ScholarForm = ({ onSuccess }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Date of Birth */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                تاريخ الميلاد *
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Date of Birth *
               </label>
               <input
                 type="date"
@@ -265,15 +261,15 @@ const ScholarForm = ({ onSuccess }) => {
                   onChange={handleInputChange}
                   className="w-5 h-5 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
                 />
-                <span className="text-sm font-semibold text-gray-700">ما زال على قيد الحياة</span>
+                <span className="text-sm font-semibold text-gray-700">Still alive</span>
               </label>
             </div>
 
             {/* Date of Death */}
             {!formData.isAlive && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                  تاريخ الوفاة *
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Date of Death *
                 </label>
                 <input
                   type="date"
@@ -291,8 +287,8 @@ const ScholarForm = ({ onSuccess }) => {
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-              رابط صورة العالم
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Scholar Image URL
             </label>
             <input
               type="url"
@@ -307,7 +303,7 @@ const ScholarForm = ({ onSuccess }) => {
           {/* Works Section */}
           <div className="border-t border-gray-200 pt-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900" dir="rtl">أعمال العالم</h3>
+              <h3 className="text-lg font-bold text-gray-900">Scholar's Works</h3>
               <button
                 type="button"
                 onClick={addWork}
@@ -316,7 +312,7 @@ const ScholarForm = ({ onSuccess }) => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                إضافة عمل
+                Add Work
               </button>
             </div>
 
@@ -331,8 +327,8 @@ const ScholarForm = ({ onSuccess }) => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Work Title */}
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                        عنوان العمل *
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Work Title *
                       </label>
                       <input
                         type="text"
@@ -341,8 +337,7 @@ const ScholarForm = ({ onSuccess }) => {
                         className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${
                           errors[`work_title_${index}`] ? 'border-red-500' : 'border-emerald-200'
                         }`}
-                        placeholder="مثال: فقه الزكاة"
-                        dir="rtl"
+                        placeholder="e.g., The Jurisprudence of Zakat"
                       />
                       {errors[`work_title_${index}`] && (
                         <p className="text-red-500 text-sm mt-1">{errors[`work_title_${index}`]}</p>
@@ -351,8 +346,8 @@ const ScholarForm = ({ onSuccess }) => {
 
                     {/* Publication Year */}
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2" dir="rtl">
-                        سنة النشر *
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Publication Year *
                       </label>
                       <input
                         type="number"
@@ -382,7 +377,7 @@ const ScholarForm = ({ onSuccess }) => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        حذف العمل
+                        Remove Work
                       </button>
                     </div>
                   )}
@@ -401,14 +396,14 @@ const ScholarForm = ({ onSuccess }) => {
               {loading ? (
                 <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  جاري الحفظ...
+                  Saving...
                 </>
               ) : (
                 <>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  حفظ العالم
+                  Save Scholar
                 </>
               )}
             </button>
