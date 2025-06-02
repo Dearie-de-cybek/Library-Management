@@ -4,16 +4,15 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
-// Import routes (we'll create these next)
-// const authRoutes = require('./routes/auth');
-// const userRoutes = require('./routes/users');
-// const bookRoutes = require('./routes/books');
-// const scholarRoutes = require('./routes/scholars');
-// const downloadRoutes = require('./routes/downloads');
-// const analyticsRoutes = require('./routes/analytics');
 
-// Import middleware (we'll create these next)
-// const errorHandler = require('./middleware/errorHandler');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const bookRoutes = require('./routes/books');
+const scholarRoutes = require('./routes/scholars');
+const downloadRoutes = require('./routes/downloads');
+
+
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -30,6 +29,7 @@ const corsOptions = {
     
     const allowedOrigins = [
       'http://localhost:5173',
+      'http://localhost:5174',
       process.env.FRONTEND_URL
     ].filter(Boolean);
     
@@ -89,14 +89,12 @@ app.get('/api', (req, res) => {
     name: 'Islamic Library Management API',
     version: '1.0.0',
     description: 'Backend API for Islamic Library Management System',
-    documentation: '/api/docs',
     endpoints: {
       auth: '/api/auth',
       users: '/api/users',
       books: '/api/books',
       scholars: '/api/scholars',
-      downloads: '/api/downloads',
-      analytics: '/api/analytics'
+      downloads: '/api/downloads'
     },
     features: [
       'User Authentication & Authorization',
@@ -151,51 +149,11 @@ app.get('/api/test/db', async (req, res) => {
   }
 });
 
-// Mount API routes (uncomment when routes are created)
-/*
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/books', bookRoutes);
-app.use('/api/scholars', scholarRoutes);
-app.use('/api/downloads', downloadRoutes);
-app.use('/api/analytics', analyticsRoutes);
-*/
+// Import routes
+const apiRoutes = require('./routes');
 
-// Temporary routes for testing (remove when actual routes are implemented)
-app.get('/api/books', (req, res) => {
-  res.json({
-    message: 'Books endpoint - Not implemented yet',
-    suggestion: 'Create controllers and routes for books'
-  });
-});
-
-app.get('/api/scholars', (req, res) => {
-  res.json({
-    message: 'Scholars endpoint - Not implemented yet',
-    suggestion: 'Create controllers and routes for scholars'
-  });
-});
-
-app.get('/api/categories', async (req, res) => {
-  try {
-    const { Category } = require('./models');
-    const categories = await Category.find({ isActive: true })
-      .sort({ sortOrder: 1 })
-      .select('name nameArabic description booksCount totalDownloads color icon');
-    
-    res.json({
-      status: 'success',
-      count: categories.length,
-      data: categories
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: 'Failed to fetch categories',
-      error: error.message
-    });
-  }
-});
+// Mount API routes
+app.use('/api', apiRoutes);
 
 // 404 handler for API routes
 app.use('/api/*', (req, res) => {
