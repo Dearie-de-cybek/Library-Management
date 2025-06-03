@@ -1,0 +1,272 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+
+class ApiService {
+  constructor() {
+    this.baseURL = API_BASE_URL;
+  }
+
+  // Helper method to get auth headers
+  getAuthHeaders() {
+    const token = localStorage.getItem('authToken');
+    return {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` })
+    };
+  }
+
+  // Generic API call method
+  async apiCall(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const config = {
+      headers: this.getAuthHeaders(),
+      ...options
+    };
+
+    try {
+      const response = await fetch(url, config);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      }
+
+      return data;
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+  }
+
+  // Auth Methods
+  async register(userData) {
+    return this.apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async login(credentials) {
+    const response = await this.apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
+    });
+    
+    // Store token in localStorage
+    if (response.data?.token) {
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    
+    return response;
+  }
+
+  async logout() {
+    try {
+      await this.apiCall('/auth/logout', { method: 'POST' });
+    } finally {
+      // Clear local storage regardless of API call success
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+    }
+  }
+
+  async getCurrentUser() {
+    return this.apiCall('/auth/me');
+  }
+
+  async updateProfile(userData) {
+    return this.apiCall('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async changePassword(passwordData) {
+    return this.apiCall('/auth/change-password', {
+      method: 'PUT',
+      body: JSON.stringify(passwordData)
+    });
+  }
+
+  // Books Methods
+  async getBooks(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/books${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getBook(id) {
+    return this.apiCall(`/books/${id}`);
+  }
+
+  async getFeaturedBooks() {
+    return this.apiCall('/books?featured=true&limit=10');
+  }
+
+  async searchBooks(query, filters = {}) {
+    const params = { search: query, ...filters };
+    return this.getBooks(params);
+  }
+
+  async downloadBook(bookId) {
+    return this.apiCall(`/books/${bookId}/download`, { method: 'POST' });
+  }
+
+  async createBook(bookData) {
+    return this.apiCall('/books', {
+      method: 'POST',
+      body: JSON.stringify(bookData)
+    });
+  }
+
+  async updateBook(id, bookData) {
+    return this.apiCall(`/books/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(bookData)
+    });
+  }
+
+  async deleteBook(id) {
+    return this.apiCall(`/books/${id}`, { method: 'DELETE' });
+  }
+
+  // Scholars Methods
+  async getScholars(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/scholars${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getScholar(id) {
+    return this.apiCall(`/scholars/${id}`);
+  }
+
+  async getScholarWorks(scholarId) {
+    return this.apiCall(`/scholars/${scholarId}/works`);
+  }
+
+  async createScholar(scholarData) {
+    return this.apiCall('/scholars', {
+      method: 'POST',
+      body: JSON.stringify(scholarData)
+    });
+  }
+
+  async updateScholar(id, scholarData) {
+    return this.apiCall(`/scholars/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(scholarData)
+    });
+  }
+
+  async deleteScholar(id) {
+    return this.apiCall(`/scholars/${id}`, { method: 'DELETE' });
+  }
+
+  // Users Methods (Admin only)
+  async getAllUsers(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/users${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getUser(id) {
+    return this.apiCall(`/users/${id}`);
+  }
+
+  async updateUserStatus(userId, action) {
+    return this.apiCall(`/users/${userId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify({ action })
+    });
+  }
+
+  async deleteUser(id) {
+    return this.apiCall(`/users/${id}`, { method: 'DELETE' });
+  }
+
+  // Downloads Methods
+  async getDownloads(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/downloads${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getUserDownloads(userId) {
+    return this.apiCall(`/downloads/user/${userId}`);
+  }
+
+  // Analytics Methods (Admin only)
+  async getAdminStats() {
+    return this.apiCall('/analytics/admin-stats');
+  }
+
+  async getDownloadStats(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = `/analytics/downloads${queryString ? `?${queryString}` : ''}`;
+    return this.apiCall(endpoint);
+  }
+
+  async getUserStats() {
+    return this.apiCall('/analytics/user-stats');
+  }
+
+  // Categories Methods
+  async getCategories() {
+    return this.apiCall('/categories');
+  }
+
+  // Health Check
+  async healthCheck() {
+    return this.apiCall('/health');
+  }
+
+  // Token Refresh
+  async refreshToken() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) {
+      throw new Error('No refresh token available');
+    }
+
+    try {
+      const response = await this.apiCall('/auth/refresh', {
+        method: 'POST',
+        body: JSON.stringify({ refreshToken })
+      });
+
+      if (response.data?.token) {
+        localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('refreshToken', response.data.refreshToken);
+      }
+
+      return response;
+    } catch (error) {
+      // If refresh fails, clear tokens and redirect to login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
+      throw error;
+    }
+  }
+
+  // Helper Methods
+  isAuthenticated() {
+    return !!localStorage.getItem('authToken');
+  }
+
+  getCurrentUserFromStorage() {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  }
+
+  isAdmin() {
+    const user = this.getCurrentUserFromStorage();
+    return user?.role === 'admin';
+  }
+}
+
+// Create and export a singleton instance
+const apiService = new ApiService();
+export default apiService;
