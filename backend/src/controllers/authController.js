@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { User } = require('../models');
 const { catchAsync, ApiError } = require('../middleware/errorHandler');
-const { sendEmail } = require('../services/emailService');
 
 /**
  * Generate JWT Token
@@ -77,18 +76,6 @@ const register = catchAsync(async (req, res, next) => {
     password,
     role: role || 'user'
   });
-
-  // Send welcome email (optional)
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: 'Welcome to Islamic Library',
-      text: `Welcome ${user.name}! Your account has been created successfully.`
-    });
-  } catch (emailError) {
-    console.error('Failed to send welcome email:', emailError);
-    // Don't fail registration if email fails
-  }
 
   sendTokenResponse(user, 201, res, 'User registered successfully');
 });
@@ -217,7 +204,7 @@ const changePassword = catchAsync(async (req, res, next) => {
 });
 
 /**
- * @desc    Forgot password
+ * @desc    Forgot password (simplified - returns reset token directly)
  * @route   POST /api/auth/forgot-password
  * @access  Public
  */
@@ -233,27 +220,17 @@ const forgotPassword = catchAsync(async (req, res, next) => {
   const resetToken = user.getResetPasswordToken();
   await user.save({ validateBeforeSave: false });
 
-  // Create reset URL
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${resetToken}`;
-
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: 'Password Reset Request - Islamic Library',
-      text: `You are receiving this email because you requested a password reset. Please click the following link to reset your password:\n\n${resetUrl}\n\nThis link will expire in 10 minutes.\n\nIf you did not request this, please ignore this email.`
-    });
-
-    res.status(200).json({
-      status: 'success',
-      message: 'Password reset email sent'
-    });
-  } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    return next(new ApiError('Email could not be sent', 500));
-  }
+  // Since we're not using email service, return the reset token directly
+  // In production, you might want to disable this endpoint or implement a different solution
+  res.status(200).json({
+    status: 'success',
+    message: 'Password reset token generated successfully',
+    data: {
+      resetToken: resetToken,
+      instructions: 'Use this token to reset your password via the reset-password endpoint',
+      expiresIn: '10 minutes'
+    }
+  });
 });
 
 /**
