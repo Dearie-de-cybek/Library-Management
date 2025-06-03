@@ -1,12 +1,16 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import UserManagement from './UserManagement';
 import ScholarForm from './ScholarForm';
 import BookForm from './BookForm';
 import LibraryService from '../services/dataService';
 
 const AdminDashboard = () => {
+  const { user, isAuthenticated, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -16,18 +20,58 @@ const AdminDashboard = () => {
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    loadDashboardStats();
+    checkAuthentication();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && isAdmin()) {
+      loadDashboardStats();
+    }
+  }, [isAuthenticated]);
+
+  const checkAuthentication = async () => {
+    try {
+      if (!isAuthenticated) {
+        navigate('/admin-login');
+        return;
+      }
+
+      if (!isAdmin()) {
+        navigate('/');
+        return;
+      }
+      
+      setAuthLoading(false);
+    } catch (error) {
+      console.error('Auth check error:', error);
+      navigate('/admin-login');
+    }
+  };
 
   const loadDashboardStats = async () => {
     try {
       setLoading(true);
-      const data = await LibraryService.getAdminStats();
-      setStats(data);
+      
+      // Try to get actual stats from backend
+      const [booksData, scholarsData, usersData] = await Promise.all([
+        LibraryService.getAllBooks(),
+        LibraryService.getScholars(),
+        LibraryService.getAllUsers()
+      ]);
+
+      setStats({
+        totalUsers: Array.isArray(usersData) ? usersData.length : 0,
+        totalBooks: Array.isArray(booksData) ? booksData.length : 0,
+        totalScholars: Array.isArray(scholarsData) ? scholarsData.length : 0,
+        totalDownloads: 0, // This would need to come from downloads endpoint
+        recentActivity: []
+      });
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
+      // Keep default stats
     } finally {
       setLoading(false);
     }
@@ -58,6 +102,34 @@ const AdminDashboard = () => {
       </div>
     </motion.div>
   );
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-0 border-4 border-emerald-200 rounded-full"
+            ></motion.div>
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-2 border-4 border-emerald-600 border-t-transparent rounded-full"
+            ></motion.div>
+          </div>
+          <p className="text-xl text-emerald-800 font-medium">Checking Authentication...</p>
+          <p className="text-emerald-600 text-sm mt-1" dir="rtl">جاري التحقق من الصلاحيات</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -103,13 +175,13 @@ const AdminDashboard = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="font-semibold">Welcome, Admin</p>
+                <p className="font-semibold">Welcome, {user?.name || 'Admin'}</p>
                 <p className="text-sm text-emerald-200" dir="rtl">مرحباً، المدير</p>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                </svg>
+                <span className="text-xl font-bold">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+                </span>
               </div>
             </div>
           </motion.div>
@@ -272,8 +344,14 @@ const AdminDashboard = () => {
         )}
 
         {activeTab === 'users' && <UserManagement />}
-        {activeTab === 'scholars' && <ScholarForm onSuccess={() => setActiveTab('overview')} />}
-        {activeTab === 'books' && <BookForm onSuccess={() => setActiveTab('overview')} />}
+        {activeTab === 'scholars' && <ScholarForm onSuccess={() => {
+          setActiveTab('overview');
+          loadDashboardStats(); // Refresh stats after adding scholar
+        }} />}
+        {activeTab === 'books' && <BookForm onSuccess={() => {
+          setActiveTab('overview');
+          loadDashboardStats(); // Refresh stats after adding book
+        }} />}
       </div>
     </div>
   );

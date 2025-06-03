@@ -1,14 +1,27 @@
 import apiService from './apiService';
 
 class LibraryService {
+  // Helper method to extract data from backend response
+  extractData(response) {
+    // Backend returns: { status: 'success', data: { books: [...] } }
+    // We want just the array/object
+    if (response?.data?.books) return response.data.books;
+    if (response?.data?.scholars) return response.data.scholars;
+    if (response?.data?.users) return response.data.users;
+    if (response?.data?.categories) return response.data.categories;
+    if (response?.data?.downloads) return response.data.downloads;
+    if (response?.data) return response.data;
+    return response || [];
+  }
+
   // Books Methods
   async getFeaturedBooks() {
     try {
       const response = await apiService.getFeaturedBooks();
-      return response.data || response;
+      console.log('getFeaturedBooks response:', response);
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching featured books:', error);
-      // Return empty array as fallback
       return [];
     }
   }
@@ -16,7 +29,8 @@ class LibraryService {
   async getAllBooks(params = {}) {
     try {
       const response = await apiService.getBooks(params);
-      return response.data || response;
+      console.log('getAllBooks response:', response);
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching books:', error);
       return [];
@@ -26,7 +40,7 @@ class LibraryService {
   async getBook(id) {
     try {
       const response = await apiService.getBook(id);
-      return response.data || response;
+      return response.data?.book || response.data || response;
     } catch (error) {
       console.error('Error fetching book:', error);
       throw error;
@@ -36,27 +50,17 @@ class LibraryService {
   async searchBooks(query, filters = {}) {
     try {
       const response = await apiService.searchBooks(query, filters);
-      return response.data || response;
+      return this.extractData(response);
     } catch (error) {
       console.error('Error searching books:', error);
       return [];
     }
   }
 
-  async downloadBook(bookId) {
-    try {
-      const response = await apiService.downloadBook(bookId);
-      return response.data || response;
-    } catch (error) {
-      console.error('Error downloading book:', error);
-      throw error;
-    }
-  }
-
   async createBook(bookData) {
     try {
       const response = await apiService.createBook(bookData);
-      return response.data || response;
+      return response.data?.book || response.data || response;
     } catch (error) {
       console.error('Error creating book:', error);
       throw error;
@@ -66,7 +70,7 @@ class LibraryService {
   async updateBook(id, bookData) {
     try {
       const response = await apiService.updateBook(id, bookData);
-      return response.data || response;
+      return response.data?.book || response.data || response;
     } catch (error) {
       console.error('Error updating book:', error);
       throw error;
@@ -87,7 +91,8 @@ class LibraryService {
   async getScholars(params = {}) {
     try {
       const response = await apiService.getScholars(params);
-      return response.data || response;
+      console.log('getScholars response:', response);
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching scholars:', error);
       return [];
@@ -97,7 +102,7 @@ class LibraryService {
   async getScholar(id) {
     try {
       const response = await apiService.getScholar(id);
-      return response.data || response;
+      return response.data?.scholar || response.data || response;
     } catch (error) {
       console.error('Error fetching scholar:', error);
       throw error;
@@ -106,8 +111,8 @@ class LibraryService {
 
   async getScholarWorks(scholarId) {
     try {
-      const response = await apiService.getScholarWorks(scholarId);
-      return response.data || response;
+      const response = await apiService.getScholarBooks(scholarId);
+      return response.data?.books || response.data || response || [];
     } catch (error) {
       console.error('Error fetching scholar works:', error);
       return [];
@@ -117,7 +122,7 @@ class LibraryService {
   async createScholar(scholarData) {
     try {
       const response = await apiService.createScholar(scholarData);
-      return response.data || response;
+      return response.data?.scholar || response.data || response;
     } catch (error) {
       console.error('Error creating scholar:', error);
       throw error;
@@ -127,7 +132,7 @@ class LibraryService {
   async updateScholar(id, scholarData) {
     try {
       const response = await apiService.updateScholar(id, scholarData);
-      return response.data || response;
+      return response.data?.scholar || response.data || response;
     } catch (error) {
       console.error('Error updating scholar:', error);
       throw error;
@@ -148,7 +153,7 @@ class LibraryService {
   async getAllUsers(params = {}) {
     try {
       const response = await apiService.getAllUsers(params);
-      return response.data || response;
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching users:', error);
       return [];
@@ -158,16 +163,16 @@ class LibraryService {
   async getUser(id) {
     try {
       const response = await apiService.getUser(id);
-      return response.data || response;
+      return response.data?.user || response.data || response;
     } catch (error) {
       console.error('Error fetching user:', error);
       throw error;
     }
   }
 
-  async updateUserStatus(userId, action) {
+  async updateUserStatus(userId, status) {
     try {
-      const response = await apiService.updateUserStatus(userId, action);
+      const response = await apiService.updateUserStatus(userId, status);
       return response.data || response;
     } catch (error) {
       console.error('Error updating user status:', error);
@@ -189,10 +194,16 @@ class LibraryService {
   async getAdminStats() {
     try {
       const response = await apiService.getAdminStats();
-      return response.data || response;
+      // For now, return mock data since backend might not have this exact endpoint
+      return {
+        totalUsers: response.data?.totalUsers || 0,
+        totalBooks: response.data?.totalBooks || 0,
+        totalScholars: response.data?.totalScholars || 0,
+        totalDownloads: response.data?.totalDownloads || 0,
+        recentActivity: response.data?.recentActivity || []
+      };
     } catch (error) {
       console.error('Error fetching admin stats:', error);
-      // Return default stats as fallback
       return {
         totalUsers: 0,
         totalBooks: 0,
@@ -206,28 +217,28 @@ class LibraryService {
   async getDownloadStats(params = {}) {
     try {
       const response = await apiService.getDownloadStats(params);
-      return response.data || response;
+      return response.data || response || {};
     } catch (error) {
       console.error('Error fetching download stats:', error);
       return {};
     }
   }
 
-  async getUserStats() {
+  // Downloads Methods
+  async downloadBook(bookId) {
     try {
-      const response = await apiService.getUserStats();
+      const response = await apiService.downloadBook(bookId);
       return response.data || response;
     } catch (error) {
-      console.error('Error fetching user stats:', error);
-      return {};
+      console.error('Error downloading book:', error);
+      throw error;
     }
   }
 
-  // Downloads Methods
   async getDownloads(params = {}) {
     try {
       const response = await apiService.getDownloads(params);
-      return response.data || response;
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching downloads:', error);
       return [];
@@ -237,7 +248,7 @@ class LibraryService {
   async getUserDownloads(userId) {
     try {
       const response = await apiService.getUserDownloads(userId);
-      return response.data || response;
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching user downloads:', error);
       return [];
@@ -248,14 +259,14 @@ class LibraryService {
   async getCategories() {
     try {
       const response = await apiService.getCategories();
-      return response.data || response;
+      return this.extractData(response);
     } catch (error) {
       console.error('Error fetching categories:', error);
       return [];
     }
   }
 
-  // Auth Methods (exposed for convenience)
+  // Auth Methods
   async login(credentials) {
     try {
       const response = await apiService.login(credentials);
@@ -282,15 +293,14 @@ class LibraryService {
       return true;
     } catch (error) {
       console.error('Error logging out:', error);
-      // Still return true since local storage is cleared regardless
-      return true;
+      return true; // Still return true since local storage is cleared
     }
   }
 
   async getCurrentUser() {
     try {
       const response = await apiService.getCurrentUser();
-      return response.data || response;
+      return response.data?.user || response.data || response;
     } catch (error) {
       console.error('Error fetching current user:', error);
       throw error;
@@ -300,7 +310,7 @@ class LibraryService {
   async updateProfile(userData) {
     try {
       const response = await apiService.updateProfile(userData);
-      return response.data || response;
+      return response.data?.user || response.data || response;
     } catch (error) {
       console.error('Error updating profile:', error);
       throw error;

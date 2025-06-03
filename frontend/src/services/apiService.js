@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
+console.log('API_BASE_URL:', API_BASE_URL);
+
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL;
@@ -17,6 +19,8 @@ class ApiService {
   // Generic API call method
   async apiCall(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    console.log('Making API call to:', url);
+    
     const config = {
       headers: this.getAuthHeaders(),
       ...options
@@ -24,6 +28,14 @@ class ApiService {
 
     try {
       const response = await fetch(url, config);
+      console.log('Response status:', response.status);
+      
+      // Check if response is JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Server returned ${contentType || 'non-JSON'} instead of JSON. Check if backend is running.`);
+      }
+      
       const data = await response.json();
 
       if (!response.ok) {
@@ -33,16 +45,26 @@ class ApiService {
       return data;
     } catch (error) {
       console.error('API Error:', error);
+      console.error('URL attempted:', url);
       throw error;
     }
   }
 
   // Auth Methods
   async register(userData) {
-    return this.apiCall('/auth/register', {
+    const response = await this.apiCall('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData)
     });
+    
+    // Store token if registration successful
+    if (response.data?.token) {
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    
+    return response;
   }
 
   async login(credentials) {
@@ -51,7 +73,7 @@ class ApiService {
       body: JSON.stringify(credentials)
     });
     
-    // Store token in localStorage
+    // Store token if login successful
     if (response.data?.token) {
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -90,7 +112,7 @@ class ApiService {
     });
   }
 
-  // Books Methods
+  // Books Methods - Match your backend exactly
   async getBooks(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = `/books${queryString ? `?${queryString}` : ''}`;
@@ -102,16 +124,22 @@ class ApiService {
   }
 
   async getFeaturedBooks() {
+    // Your backend uses featured=true parameter
     return this.apiCall('/books?featured=true&limit=10');
   }
 
-  async searchBooks(query, filters = {}) {
-    const params = { search: query, ...filters };
-    return this.getBooks(params);
+  async getPopularBooks() {
+    return this.apiCall('/books/popular');
   }
 
-  async downloadBook(bookId) {
-    return this.apiCall(`/books/${bookId}/download`, { method: 'POST' });
+  async getRecentBooks() {
+    return this.apiCall('/books/recent');
+  }
+
+  async searchBooks(query, filters = {}) {
+    const params = { q: query, ...filters };
+    const queryString = new URLSearchParams(params).toString();
+    return this.apiCall(`/books/search?${queryString}`);
   }
 
   async createBook(bookData) {
@@ -132,7 +160,7 @@ class ApiService {
     return this.apiCall(`/books/${id}`, { method: 'DELETE' });
   }
 
-  // Scholars Methods
+  // Scholars Methods - Match your backend exactly
   async getScholars(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = `/scholars${queryString ? `?${queryString}` : ''}`;
@@ -143,8 +171,8 @@ class ApiService {
     return this.apiCall(`/scholars/${id}`);
   }
 
-  async getScholarWorks(scholarId) {
-    return this.apiCall(`/scholars/${scholarId}/works`);
+  async getScholarBooks(scholarId) {
+    return this.apiCall(`/scholars/${scholarId}/books`);
   }
 
   async createScholar(scholarData) {
@@ -176,10 +204,17 @@ class ApiService {
     return this.apiCall(`/users/${id}`);
   }
 
-  async updateUserStatus(userId, action) {
+  async updateUser(id, userData) {
+    return this.apiCall(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async updateUserStatus(userId, status) {
     return this.apiCall(`/users/${userId}/status`, {
       method: 'PUT',
-      body: JSON.stringify({ action })
+      body: JSON.stringify({ status })
     });
   }
 
@@ -188,6 +223,10 @@ class ApiService {
   }
 
   // Downloads Methods
+  async downloadBook(bookId) {
+    return this.apiCall(`/downloads/book/${bookId}`, { method: 'POST' });
+  }
+
   async getDownloads(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = `/downloads${queryString ? `?${queryString}` : ''}`;
@@ -198,19 +237,25 @@ class ApiService {
     return this.apiCall(`/downloads/user/${userId}`);
   }
 
+  async getMyDownloads() {
+    return this.apiCall('/downloads/my-downloads');
+  }
+
+  async getMyDownloadStats() {
+    return this.apiCall('/downloads/my-stats');
+  }
+
   // Analytics Methods (Admin only)
   async getAdminStats() {
-    return this.apiCall('/analytics/admin-stats');
+    // This might need to be implemented in your backend
+    // For now, we'll try the dashboard endpoint
+    return this.apiCall('/users/dashboard');
   }
 
   async getDownloadStats(params = {}) {
     const queryString = new URLSearchParams(params).toString();
-    const endpoint = `/analytics/downloads${queryString ? `?${queryString}` : ''}`;
+    const endpoint = `/downloads/analytics${queryString ? `?${queryString}` : ''}`;
     return this.apiCall(endpoint);
-  }
-
-  async getUserStats() {
-    return this.apiCall('/analytics/user-stats');
   }
 
   // Categories Methods
@@ -220,7 +265,7 @@ class ApiService {
 
   // Health Check
   async healthCheck() {
-    return this.apiCall('/health');
+    return this.apiCall('/');
   }
 
   // Token Refresh
@@ -243,7 +288,7 @@ class ApiService {
 
       return response;
     } catch (error) {
-      // If refresh fails, clear tokens and redirect to login
+      // If refresh fails, clear tokens
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');

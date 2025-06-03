@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import LibraryService from '../services/dataService';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('joinDate');
+  const [sortBy, setSortBy] = useState('createdAt');
   const [filterBy, setFilterBy] = useState('all');
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -19,9 +19,11 @@ const UserManagement = () => {
     try {
       setLoading(true);
       const data = await LibraryService.getAllUsers();
-      setUsers(data);
+      console.log('Users loaded:', data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading users:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -29,29 +31,36 @@ const UserManagement = () => {
 
   const handleUserAction = async (userId, action) => {
     try {
-      await LibraryService.updateUserStatus(userId, action);
-      await loadUsers(); // Reload users after action
+      if (action === 'activate' || action === 'deactivate') {
+        const status = action === 'activate' ? 'active' : 'inactive';
+        await LibraryService.updateUserStatus(userId, status);
+        await loadUsers(); // Reload users after action
+      } else {
+        console.log('Action not implemented:', action);
+        alert('This action is not yet implemented in the backend.');
+      }
     } catch (error) {
       console.error('Error updating user:', error);
+      alert('Error updating user: ' + error.message);
     }
   };
 
-  // Filter and sort users
-  const filteredUsers = users
+  // Filter and sort users with safety checks
+  const filteredUsers = (Array.isArray(users) ? users : [])
     .filter(user => {
-      const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           (user.email || '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter = filterBy === 'all' || 
                            (filterBy === 'active' && user.status === 'active') ||
                            (filterBy === 'inactive' && user.status === 'inactive') ||
-                           (filterBy === 'premium' && user.isPremium);
+                           (filterBy === 'admin' && user.role === 'admin');
       return matchesSearch && matchesFilter;
     })
     .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'downloads') return b.totalDownloads - a.totalDownloads;
-      if (sortBy === 'joinDate') return new Date(b.joinDate) - new Date(a.joinDate);
-      if (sortBy === 'lastActive') return new Date(b.lastActive) - new Date(a.lastActive);
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'totalDownloads') return (b.totalDownloads || 0) - (a.totalDownloads || 0);
+      if (sortBy === 'createdAt') return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      if (sortBy === 'lastActive') return new Date(b.lastActive || 0) - new Date(a.lastActive || 0);
       return 0;
     });
 
@@ -96,12 +105,12 @@ const UserManagement = () => {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
                   <span className="text-2xl font-bold text-emerald-600">
-                    {user.name.charAt(0).toUpperCase()}
+                    {(user.name || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
                 <div>
-                  <h4 className="text-xl font-bold text-gray-900">{user.name}</h4>
-                  <p className="text-gray-600">{user.email}</p>
+                  <h4 className="text-xl font-bold text-gray-900">{user.name || 'Unknown User'}</h4>
+                  <p className="text-gray-600">{user.email || 'No email'}</p>
                 </div>
               </div>
 
@@ -109,12 +118,16 @@ const UserManagement = () => {
                 <div>
                   <span className="text-gray-900 font-semibold">Join Date</span>
                   <span className="text-gray-500 text-sm ml-2" dir="rtl">تاريخ الانضمام</span>
-                  <p className="font-semibold text-gray-700">{new Date(user.joinDate).toLocaleDateString()}</p>
+                  <p className="font-semibold text-gray-700">
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-900 font-semibold">Last Active</span>
                   <span className="text-gray-500 text-sm ml-2" dir="rtl">آخر نشاط</span>
-                  <p className="font-semibold text-gray-700">{new Date(user.lastActive).toLocaleDateString()}</p>
+                  <p className="font-semibold text-gray-700">
+                    {user.lastActive ? new Date(user.lastActive).toLocaleDateString() : 'Unknown'}
+                  </p>
                 </div>
                 <div>
                   <span className="text-gray-900 font-semibold">Status</span>
@@ -128,29 +141,29 @@ const UserManagement = () => {
                   </div>
                 </div>
                 <div>
-                  <span className="text-gray-900 font-semibold">Account Type</span>
-                  <span className="text-gray-500 text-sm ml-2" dir="rtl">النوع</span>
+                  <span className="text-gray-900 font-semibold">Role</span>
+                  <span className="text-gray-500 text-sm ml-2" dir="rtl">الدور</span>
                   <div className="mt-1">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      user.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
+                      user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {user.isPremium ? 'Premium' : 'Standard'}
+                      {user.role === 'admin' ? 'Administrator' : 'User'}
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Download Stats */}
+            {/* User Stats */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <h5 className="font-bold text-gray-900">Download Statistics</h5>
-                <span className="text-gray-500 text-sm" dir="rtl">إحصائيات التحميل</span>
+                <h5 className="font-bold text-gray-900">User Statistics</h5>
+                <span className="text-gray-500 text-sm" dir="rtl">إحصائيات المستخدم</span>
               </div>
               <div className="space-y-4">
                 <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-emerald-600">{user.totalDownloads}</p>
+                    <p className="text-3xl font-bold text-emerald-600">{user.totalDownloads || 0}</p>
                     <p className="text-emerald-700 text-sm font-semibold">Total Downloads</p>
                     <p className="text-emerald-600 text-xs" dir="rtl">إجمالي التحميلات</p>
                   </div>
@@ -158,38 +171,17 @@ const UserManagement = () => {
                 
                 <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-blue-600">{user.monthlyDownloads}</p>
+                    <p className="text-2xl font-bold text-blue-600">{user.monthlyDownloads || 0}</p>
                     <p className="text-blue-700 text-sm font-semibold">This Month</p>
                     <p className="text-blue-600 text-xs" dir="rtl">هذا الشهر</p>
                   </div>
                 </div>
 
-                <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100">
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-purple-600">{user.favoriteCategory}</p>
-                    <p className="text-purple-700 text-sm font-semibold">Favorite Category</p>
-                    <p className="text-purple-600 text-xs" dir="rtl">التصنيف المفضل</p>
+                    <p className="text-xs text-gray-600 mb-2">Account ID</p>
+                    <p className="text-sm font-mono text-gray-800 break-all">{user._id || user.id}</p>
                   </div>
-                </div>
-              </div>
-
-              {/* Recent Downloads */}
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <h6 className="font-semibold text-gray-900">Recent Downloads</h6>
-                  <span className="text-gray-500 text-xs" dir="rtl">آخر التحميلات</span>
-                </div>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {user.recentDownloads && user.recentDownloads.length > 0 ? (
-                    user.recentDownloads.map((download, index) => (
-                      <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
-                        <span className="text-sm text-gray-700">{download.bookTitle}</span>
-                        <span className="text-xs text-gray-500">{download.date}</span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 text-sm text-center py-4">No recent downloads</p>
-                  )}
                 </div>
               </div>
             </div>
@@ -198,24 +190,21 @@ const UserManagement = () => {
           {/* Action Buttons */}
           <div className="flex gap-4 mt-6 pt-6 border-t border-gray-200">
             <button
-              onClick={() => handleUserAction(user.id, user.status === 'active' ? 'deactivate' : 'activate')}
+              onClick={() => handleUserAction(user._id || user.id, user.status === 'active' ? 'deactivate' : 'activate')}
               className={`flex-1 py-3 px-6 rounded-xl font-bold transition-all duration-200 ${
                 user.status === 'active'
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-green-600 text-white hover:bg-green-700'
               }`}
+              disabled={user.role === 'admin'} // Prevent admin self-deactivation
             >
               {user.status === 'active' ? 'Deactivate User' : 'Activate User'}
             </button>
             <button
-              onClick={() => handleUserAction(user.id, user.isPremium ? 'removePremium' : 'makePremium')}
-              className={`flex-1 py-3 px-6 rounded-xl font-bold transition-all duration-200 ${
-                user.isPremium
-                  ? 'bg-gray-600 text-white hover:bg-gray-700'
-                  : 'bg-amber-600 text-white hover:bg-amber-700'
-              }`}
+              onClick={onClose}
+              className="flex-1 py-3 px-6 rounded-xl font-bold transition-all duration-200 bg-gray-600 text-white hover:bg-gray-700"
             >
-              {user.isPremium ? 'Remove Premium' : 'Make Premium'}
+              Close
             </button>
           </div>
         </div>
@@ -271,7 +260,7 @@ const UserManagement = () => {
             <option value="all">All Users</option>
             <option value="active">Active Users</option>
             <option value="inactive">Inactive Users</option>
-            <option value="premium">Premium Users</option>
+            <option value="admin">Administrators</option>
           </select>
 
           {/* Sort */}
@@ -280,9 +269,9 @@ const UserManagement = () => {
             onChange={(e) => setSortBy(e.target.value)}
             className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           >
-            <option value="joinDate">Sort by Join Date</option>
+            <option value="createdAt">Sort by Join Date</option>
             <option value="name">Sort by Name</option>
-            <option value="downloads">Sort by Downloads</option>
+            <option value="totalDownloads">Sort by Downloads</option>
             <option value="lastActive">Sort by Last Active</option>
           </select>
         </div>
@@ -290,112 +279,111 @@ const UserManagement = () => {
 
       {/* Users Table */}
       <div className="bg-white rounded-3xl shadow-lg border border-emerald-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-emerald-50 border-b border-emerald-100">
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>User</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">المستخدم</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>Join Date</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">تاريخ الانضمام</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>Total Downloads</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">إجمالي التحميلات</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>This Month</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">هذا الشهر</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>Status</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">الحالة</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>Type</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">النوع</span>
-                  </div>
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
-                  <div className="flex flex-col">
-                    <span>Actions</span>
-                    <span className="text-xs text-emerald-600" dir="rtl">الإجراءات</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredUsers.map((user, index) => (
-                <motion.tr
-                  key={user.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="hover:bg-emerald-25 transition-colors duration-200"
-                >
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <span className="font-bold text-emerald-600">
-                          {user.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <div className="font-semibold text-gray-900">{user.name}</div>
-                        <div className="text-sm text-gray-600">{user.email}</div>
-                      </div>
+        {filteredUsers.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">👥</div>
+            <p className="text-gray-500 mb-2">No users found</p>
+            <p className="text-gray-400 text-sm" dir="rtl">لم يتم العثور على مستخدمين</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-emerald-50 border-b border-emerald-100">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>User</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">المستخدم</span>
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {new Date(user.joinDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-bold text-emerald-600">{user.totalDownloads}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-semibold text-blue-600">{user.monthlyDownloads}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.status === 'active' ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      user.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {user.isPremium ? 'Premium' : 'Standard'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => setSelectedUser(user)}
-                      className="text-emerald-600 hover:text-emerald-800 font-semibold text-sm hover:underline"
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>Role</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">الدور</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>Join Date</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">تاريخ الانضمام</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>Downloads</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">التحميلات</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>Status</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">الحالة</span>
+                    </div>
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-emerald-800">
+                    <div className="flex flex-col">
+                      <span>Actions</span>
+                      <span className="text-xs text-emerald-600" dir="rtl">الإجراءات</span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredUsers.map((user, index) => (
+                  <motion.tr
+                    key={user._id || user.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="hover:bg-emerald-25 transition-colors duration-200"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                          <span className="font-bold text-emerald-600">
+                            {(user.name || 'U').charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="font-semibold text-gray-900">{user.name || 'Unknown User'}</div>
+                          <div className="text-sm text-gray-600">{user.email || 'No email'}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.role === 'admin' ? 'Admin' : 'User'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-bold text-emerald-600">{user.totalDownloads || 0}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {user.status === 'active' ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => setSelectedUser(user)}
+                        className="text-emerald-600 hover:text-emerald-800 font-semibold text-sm hover:underline"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Results Count */}
@@ -405,12 +393,14 @@ const UserManagement = () => {
       </div>
 
       {/* User Detail Modal */}
-      {selectedUser && (
-        <UserDetailModal
-          user={selectedUser}
-          onClose={() => setSelectedUser(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedUser && (
+          <UserDetailModal
+            user={selectedUser}
+            onClose={() => setSelectedUser(null)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

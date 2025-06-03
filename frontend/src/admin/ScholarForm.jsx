@@ -18,6 +18,7 @@ const ScholarForm = ({ onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState('');
 
   const specializations = [
     'Islamic Jurisprudence (Fiqh)',
@@ -43,6 +44,10 @@ const ScholarForm = ({ onSuccess }) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    // Clear errors when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleWorkChange = (index, field, value) => {
@@ -98,8 +103,32 @@ const ScholarForm = ({ onSuccess }) => {
     if (!validateForm()) return;
 
     setLoading(true);
+    setSuccessMessage('');
+    setErrors({});
+    
     try {
-      await LibraryService.createScholar(formData);
+      const scholarData = {
+        ...formData,
+        // Convert date strings to proper format if needed
+        dateOfBirth: formData.dateOfBirth,
+        dateOfDeath: formData.dateOfDeath || null,
+        // Process works
+        works: formData.works.map(work => ({
+          ...work,
+          year: parseInt(work.year),
+          downloads: 0 // New works start with 0 downloads
+        })),
+        // Add defaults
+        profileViews: 0,
+        totalBooksDownloads: 0,
+        booksCount: formData.works.length,
+        isFeatured: false,
+        isActive: true
+      };
+
+      const response = await LibraryService.createScholar(scholarData);
+      console.log('Scholar created successfully:', response);
+      
       // Reset form
       setFormData({
         name: '',
@@ -114,11 +143,15 @@ const ScholarForm = ({ onSuccess }) => {
         works: [{ title: '', year: '', downloads: 0 }]
       });
       setErrors({});
-      onSuccess && onSuccess();
-      alert('Scholar added successfully!');
+      setSuccessMessage('Scholar added successfully!');
+      
+      if (onSuccess) onSuccess();
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
       console.error('Error creating scholar:', error);
-      alert('Error occurred while adding scholar');
+      setErrors({ submit: error.message || 'Error occurred while adding scholar' });
     } finally {
       setLoading(false);
     }
@@ -136,6 +169,38 @@ const ScholarForm = ({ onSuccess }) => {
           <h2 className="text-2xl font-bold mb-2">Add New Islamic Scholar</h2>
           <p className="text-emerald-100">Register a new scholar in the Islamic library</p>
         </div>
+
+        {/* Success Message */}
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-green-50 border-l-4 border-green-500 text-green-700 px-6 py-4"
+          >
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              {successMessage}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Error Message */}
+        {errors.submit && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4"
+          >
+            <div className="flex items-center">
+              <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              {errors.submit}
+            </div>
+          </motion.div>
+        )}
 
         {/* Form */}
         <div className="p-6 space-y-6">
