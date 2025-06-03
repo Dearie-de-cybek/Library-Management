@@ -1,5 +1,8 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Navbar from '../components/Navbar';
+import LoadingScreen from '../components/LoadingScreen';
 import LibraryService from '../services/dataService';
 
 const BooksPage = () => {
@@ -9,7 +12,7 @@ const BooksPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('downloads');
-  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const [viewMode, setViewMode] = useState('grid'); 
 
   useEffect(() => {
     loadBooks();
@@ -66,33 +69,14 @@ const BooksPage = () => {
   const categories = [...new Set(books.map(book => book.category))].sort();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-0 border-4 border-emerald-200 rounded-full"
-            ></motion.div>
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-2 border-4 border-emerald-600 border-t-transparent rounded-full"
-            ></motion.div>
-          </div>
-          <p className="text-xl text-emerald-800 font-medium">Loading books...</p>
-        </motion.div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 relative">
+      {/* Navbar */}
+      <Navbar />
+      
       {/* Paper texture */}
       <div className="absolute inset-0 opacity-[0.015] pointer-events-none">
         <div className="absolute inset-0" style={{
