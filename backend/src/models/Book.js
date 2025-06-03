@@ -33,6 +33,61 @@ const islamicCategories = [
   'Black Muslims.'
 ];
 
+// Helper function for ISBN validation
+function validateISBN(isbn) {
+  if (!isbn) return true; // Allow empty ISBN
+  
+  // Remove all non-digit characters except X
+  const cleanISBN = isbn.replace(/[^0-9X]/gi, '').toUpperCase();
+  
+  // Check if it's ISBN-10 or ISBN-13
+  if (cleanISBN.length === 10) {
+    return validateISBN10(cleanISBN);
+  } else if (cleanISBN.length === 13) {
+    return validateISBN13(cleanISBN);
+  }
+  
+  return false;
+}
+
+function validateISBN10(isbn) {
+  // ISBN-10 validation
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    if (!/\d/.test(isbn[i])) return false;
+    sum += parseInt(isbn[i]) * (10 - i);
+  }
+  
+  // Last digit can be 0-9 or X (representing 10)
+  const lastChar = isbn[9];
+  if (lastChar === 'X') {
+    sum += 10;
+  } else if (/\d/.test(lastChar)) {
+    sum += parseInt(lastChar);
+  } else {
+    return false;
+  }
+  
+  return sum % 11 === 0;
+}
+
+function validateISBN13(isbn) {
+  // ISBN-13 validation
+  if (!isbn.startsWith('978') && !isbn.startsWith('979')) {
+    return false;
+  }
+  
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    if (!/\d/.test(isbn[i])) return false;
+    const digit = parseInt(isbn[i]);
+    sum += i % 2 === 0 ? digit : digit * 3;
+  }
+  
+  const checkDigit = (10 - (sum % 10)) % 10;
+  return checkDigit === parseInt(isbn[12]);
+}
+
 const bookSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -98,13 +153,8 @@ const bookSchema = new mongoose.Schema({
     trim: true,
     sparse: true,
     validate: {
-      validator: function(isbn) {
-        if (!isbn) return true; // Allow empty ISBN
-
-        const isbnRegex = /^(?:ISBN(?:-1[03])?:? )?(?=[0-9X]{10}$|(?=(?:[0-9]+[- ]){3})[- 0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[- ]){4})[- 0-9]{17}$)(?:97[89][- ]?)?[0-9]{1,5}[- ]?[0-9]+[- ]?[0-9]+[- ]?[0-9X]$/;
-        return isbnRegex.test(isbn.replace(/[- ]/g, ''));
-      },
-      message: 'Please enter a valid ISBN'
+      validator: validateISBN,
+      message: 'Please enter a valid ISBN-10 or ISBN-13'
     }
   },
   

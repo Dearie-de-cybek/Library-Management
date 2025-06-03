@@ -1,3 +1,4 @@
+// src/utils/constants.js
 
 /**
  * User roles
@@ -271,7 +272,7 @@ const VALIDATION = {
     MAX_LENGTH: 5000
   },
   YEAR: {
-    MIN_YEAR: 1400,
+    MIN_YEAR: 600,
     MAX_YEAR: new Date().getFullYear()
   }
 };

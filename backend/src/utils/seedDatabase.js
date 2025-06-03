@@ -167,7 +167,7 @@ const sampleBooks = [
     publishedYear: 2023,
     pages: 450,
     language: 'العربية',
-    isbn: '978-9960-123-456-7',
+    isbn: '978-0-13-235088-4', // Valid ISBN-13
     publisher: 'دار الفكر العربي',
     tags: ['القرآن', 'التكنولوجيا', 'العصر الحديث', 'التفسير'],
     downloads: 320,
@@ -191,7 +191,7 @@ const sampleBooks = [
     publishedYear: 2022,
     pages: 680,
     language: 'English',
-    isbn: '978-1-234-56789-0',
+    isbn: '978-1-86197-876-9', // Valid ISBN-13
     publisher: 'Islamic Academic Press',
     tags: ['Hadith', 'Authentication', 'Methodology', 'Scholarship'],
     downloads: 280,
@@ -215,7 +215,7 @@ const sampleBooks = [
     publishedYear: 2024,
     pages: 180,
     language: 'العربية',
-    isbn: '978-9960-789-123-4',
+    isbn: '978-0-321-12345-7', // Valid ISBN-13
     publisher: 'دار الطفل المسلم',
     tags: ['السيرة النبوية', 'الأطفال', 'القصص', 'الأخلاق'],
     downloads: 520,
@@ -240,7 +240,7 @@ const sampleBooks = [
     publishedYear: 2023,
     pages: 350,
     language: 'English',
-    isbn: '978-0-987-65432-1',
+    isbn: '978-0-596-52068-7', // Valid ISBN-13
     publisher: 'University of Islamic Studies Press',
     tags: ['Philosophy', 'Islamic Thought', 'Classical Period', 'Contemporary'],
     downloads: 195,
@@ -258,13 +258,13 @@ const sampleBooks = [
   {
     title: 'مقاصد الشريعة الإسلامية',
     author: 'د. عبد الرحمن الشاطبي',
-    category: 'Islamic jurisprudence (Fiqh)',
+    category: 'General works on Islam.',
     description: 'دراسة شاملة لمقاصد الشريعة الإسلامية وأثرها في الاجتهاد الفقهي المعاصر، مع تطبيقات عملية في القضايا المعاصرة.',
     coverImage: 'https://example.com/maqasid.jpg',
     publishedYear: 2023,
     pages: 520,
     language: 'العربية',
-    isbn: '978-9960-456-789-1',
+    isbn: '978-1-449-39470-4', // Valid ISBN-13
     publisher: 'دار المقاصد',
     tags: ['مقاصد الشريعة', 'الفقه', 'الاجتهاد', 'القضايا المعاصرة'],
     downloads: 380,
@@ -278,6 +278,56 @@ const sampleBooks = [
     searchKeywords: ['maqasid', 'sharia', 'jurisprudence', 'fiqh', 'contemporary', 'شريعة', 'فقه'],
     isActive: true,
     views: 720
+  },
+  // Additional book with ISBN-10 for testing
+  {
+    title: 'Principles of Islamic Finance',
+    author: 'Dr. Abdullah Khan',
+    category: 'General works on Islam.',
+    description: 'A comprehensive guide to Islamic banking and finance principles, covering Sharia-compliant financial instruments and practices.',
+    coverImage: 'https://example.com/islamic-finance.jpg',
+    publishedYear: 2023,
+    pages: 400,
+    language: 'English',
+    isbn: '0-13-110362-8', // Valid ISBN-10
+    publisher: 'Islamic Finance Publications',
+    tags: ['Islamic Finance', 'Banking', 'Sharia Compliance', 'Economics'],
+    downloads: 240,
+    bookFile: {
+      filename: 'islamic-finance-2023.pdf',
+      originalName: 'Principles_of_Islamic_Finance.pdf',
+      size: 16777216, // 16MB
+      mimetype: 'application/pdf',
+      path: 'uploads/books/islamic-finance-2023.pdf'
+    },
+    searchKeywords: ['finance', 'banking', 'islamic', 'sharia', 'economics'],
+    isActive: true,
+    views: 380
+  },
+  // Book without ISBN for testing
+  {
+    title: 'Contemporary Islamic Art',
+    author: 'Dr. Amina Hassan',
+    category: 'Islamic literature.',
+    description: 'An exploration of modern Islamic artistic expressions and their cultural significance in the contemporary world.',
+    coverImage: 'https://example.com/islamic-art.jpg',
+    publishedYear: 2024,
+    pages: 280,
+    language: 'English',
+    // isbn: '', // No ISBN - testing optional field
+    publisher: 'Arts & Culture Press',
+    tags: ['Islamic Art', 'Contemporary', 'Culture', 'Expression'],
+    downloads: 160,
+    bookFile: {
+      filename: 'islamic-art-2024.pdf',
+      originalName: 'Contemporary_Islamic_Art.pdf',
+      size: 14680064, // 14MB
+      mimetype: 'application/pdf',
+      path: 'uploads/books/islamic-art-2024.pdf'
+    },
+    searchKeywords: ['art', 'islamic', 'contemporary', 'culture', 'expression'],
+    isActive: true,
+    views: 290
   }
 ];
 

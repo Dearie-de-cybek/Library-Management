@@ -1,16 +1,17 @@
+// src/middleware/validation.js
 const Joi = require('joi');
 
 /**
  * Generic validation middleware
- * @param {Object} schema 
- * @param {string} property 
+ * @param {Object} schema - Joi validation schema
+ * @param {string} property - Property to validate (body, query, params)
  */
 const validate = (schema, property = 'body') => {
   return (req, res, next) => {
     const { error, value } = schema.validate(req[property], {
-      abortEarly: false, 
-      stripUnknown: true, 
-      allowUnknown: false 
+      abortEarly: false, // Show all validation errors
+      stripUnknown: true, // Remove unknown fields
+      allowUnknown: false // Don't allow unknown fields
     });
 
     if (error) {
@@ -379,11 +380,11 @@ const schemas = {
           }),
         year: Joi.number()
           .integer()
-          .min(1300)
+          .min(600)
           .max(new Date().getFullYear())
           .required()
           .messages({
-            'number.min': 'Publication year must be after 1300',
+            'number.min': 'Publication year must be after 600 CE',
             'number.max': 'Publication year cannot be in the future',
             'any.required': 'Publication year is required'
           }),
@@ -473,7 +474,7 @@ const schemas = {
   })
 };
 
-
+// Specific validation middleware functions
 const validateRegister = validate(schemas.registerUser);
 const validateLogin = validate(schemas.loginUser);
 const validateUpdateUser = validate(schemas.updateUser);

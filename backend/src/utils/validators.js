@@ -1,3 +1,4 @@
+// src/utils/validators.js
 const mongoose = require('mongoose');
 
 /**
@@ -451,7 +452,7 @@ const formatFileSize = (bytes) => {
  */
 const validateYear = (year, options = {}) => {
   const {
-    minYear = 1400,
+    minYear = 600,
     maxYear = new Date().getFullYear(),
     allowFuture = false
   } = options;

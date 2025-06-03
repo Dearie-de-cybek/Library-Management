@@ -101,7 +101,7 @@ const scholarSchema = new mongoose.Schema({
     year: {
       type: Number,
       required: true,
-      min: [1300, 'Publication year must be after 1300'],
+      min: [600, 'Publication year must be after 1300'],
       max: [new Date().getFullYear(), 'Publication year cannot be in the future']
     },
     downloads: {
