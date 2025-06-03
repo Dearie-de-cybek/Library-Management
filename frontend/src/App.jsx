@@ -10,6 +10,7 @@ import Home from "./pages/Home";
 import ScholarsPage from "./pages/ScholarsPage";
 import BooksPage from "./pages/BooksPage";
 import AdminDashboard from "./admin/AdminDashboard";
+import AdminLogin from "./admin/AdminLogin";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Route path="/scholars" element={<ScholarsPage />} />
       <Route path="/books" element={<BooksPage />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
     </Routes>
   );
 }

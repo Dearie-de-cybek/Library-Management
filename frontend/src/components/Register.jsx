@@ -1,21 +1,26 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import LibraryService from '../services/dataService';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { register, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({});
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => clearError();
+  }, [clearError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,37 +28,42 @@ const Register = () => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
-    if (error) setError('');
+    // Clear errors when user starts typing
+    if (error) clearError();
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const validateForm = () => {
+    const errors = {};
+
     if (!formData.name.trim()) {
-      setError('Name is required');
-      return false;
+      errors.name = 'Name is required';
     }
     if (!formData.email.trim()) {
-      setError('Email is required');
-      return false;
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Email is invalid';
     }
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return false;
+      errors.password = 'Password must be at least 6 characters long';
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return false;
+      errors.confirmPassword = 'Passwords do not match';
     }
-    return true;
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) return;
-
-    setLoading(true);
-    setError('');
 
     try {
       const userData = {
@@ -62,14 +72,11 @@ const Register = () => {
         password: formData.password
       };
       
-      await LibraryService.register(userData);
-      // Redirect to home page after successful registration
+      await register(userData);
       navigate('/');
-      window.location.reload(); // Refresh to update auth state
-    } catch (error) {
-      setError(error.message || 'Registration failed. Please try again.');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // Error is handled in AuthContext
+      console.error('Registration failed:', err);
     }
   };
 
@@ -158,9 +165,15 @@ const Register = () => {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30"
+              disabled={loading}
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30 disabled:opacity-50 disabled:cursor-not-allowed ${
+                validationErrors.name ? 'border-red-500' : 'border-blue-200'
+              }`}
               placeholder="Enter your full name"
             />
+            {validationErrors.name && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.name}</p>
+            )}
           </div>
 
           {/* Email Field */}
@@ -177,9 +190,15 @@ const Register = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30"
+              disabled={loading}
+              className={`w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30 disabled:opacity-50 disabled:cursor-not-allowed ${
+                validationErrors.email ? 'border-red-500' : 'border-blue-200'
+              }`}
               placeholder="your.email@example.com"
             />
+            {validationErrors.email && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+            )}
           </div>
 
           {/* Password Field */}
@@ -198,13 +217,17 @@ const Register = () => {
                 onChange={handleInputChange}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 pr-12 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30"
+                disabled={loading}
+                className={`w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  validationErrors.password ? 'border-red-500' : 'border-blue-200'
+                }`}
                 placeholder="Choose a strong password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                disabled={loading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600 transition-colors duration-200 disabled:opacity-50"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {showPassword ? (
@@ -215,6 +238,9 @@ const Register = () => {
                 </svg>
               </button>
             </div>
+            {validationErrors.password && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.password}</p>
+            )}
             
             {/* Password Strength Indicator */}
             {formData.password && (
@@ -249,13 +275,17 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 pr-12 border-2 border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30"
+                disabled={loading}
+                className={`w-full px-4 py-3 pr-12 border-2 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-blue-50/30 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  validationErrors.confirmPassword ? 'border-red-500' : 'border-blue-200'
+                }`}
                 placeholder="Confirm your password"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600 transition-colors duration-200"
+                disabled={loading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-blue-600 transition-colors duration-200 disabled:opacity-50"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {showConfirmPassword ? (
@@ -266,6 +296,10 @@ const Register = () => {
                 </svg>
               </button>
             </div>
+            {validationErrors.confirmPassword && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.confirmPassword}</p>
+            )}
+            
             {/* Password Match Indicator */}
             {formData.confirmPassword && (
               <div className="mt-2 flex items-center">
@@ -293,7 +327,8 @@ const Register = () => {
             <input
               type="checkbox"
               required
-              className="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mt-1"
+              disabled={loading}
+              className="w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500 mt-1 disabled:opacity-50"
             />
             <label className="ml-3 text-sm text-gray-600">
               I agree to the{' '}
@@ -335,24 +370,22 @@ const Register = () => {
               <p className="text-gray-600 mb-2">
                 Already have an account?
               </p>
-              <button
-                type="button"
-                onClick={() => navigate('/login')}
+              <Link
+                to="/login"
                 className="text-blue-600 hover:text-blue-700 font-bold hover:underline text-lg"
               >
                 Sign In Here
-              </button>
+              </Link>
               <p className="text-blue-600 text-sm mt-1" dir="rtl">تسجيل الدخول</p>
             </div>
 
             <div className="text-center">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
+              <Link
+                to="/"
                 className="text-gray-500 hover:text-gray-700 text-sm hover:underline"
               >
                 ← Back to Home
-              </button>
+              </Link>
             </div>
           </div>
         </form>

@@ -1,18 +1,22 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import LibraryService from '../services/dataService';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login, loading, error, clearError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+
+  // Clear error when component unmounts
+  useEffect(() => {
+    return () => clearError();
+  }, [clearError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,29 +25,22 @@ const Login = () => {
       [name]: value
     }));
     // Clear error when user starts typing
-    if (error) setError('');
+    if (error) clearError();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
       return;
     }
 
-    setLoading(true);
-    setError('');
-
     try {
-      await LibraryService.login(formData);
-      // Redirect to home page after successful login
+      await login(formData);
       navigate('/');
-      window.location.reload(); // Refresh to update auth state
-    } catch (error) {
-      setError(error.message || 'Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // Error is handled in AuthContext
+      console.error('Login failed:', err);
     }
   };
 
@@ -108,7 +105,8 @@ const Login = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-3 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30"
+              disabled={loading}
+              className="w-full px-4 py-3 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="your.email@example.com"
             />
           </div>
@@ -128,13 +126,15 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 pr-12 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30"
+                disabled={loading}
+                className="w-full px-4 py-3 pr-12 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-emerald-600 transition-colors duration-200"
+                disabled={loading}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-emerald-600 transition-colors duration-200 disabled:opacity-50"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {showPassword ? (
@@ -152,13 +152,15 @@ const Login = () => {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                disabled={loading}
+                className="w-4 h-4 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500 disabled:opacity-50"
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
             <button
               type="button"
-              className="text-sm text-emerald-600 hover:text-emerald-700 font-semibold hover:underline"
+              disabled={loading}
+              className="text-sm text-emerald-600 hover:text-emerald-700 font-semibold hover:underline disabled:opacity-50"
             >
               Forgot Password?
             </button>
@@ -167,7 +169,7 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !formData.email || !formData.password}
             className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white py-4 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
           >
             {loading ? (
@@ -192,24 +194,22 @@ const Login = () => {
               <p className="text-gray-600 mb-2">
                 New to Islamic Library?
               </p>
-              <button
-                type="button"
-                onClick={() => navigate('/register')}
+              <Link
+                to="/register"
                 className="text-emerald-600 hover:text-emerald-700 font-bold hover:underline text-lg"
               >
                 Create Your Account
-              </button>
+              </Link>
               <p className="text-emerald-600 text-sm mt-1" dir="rtl">إنشاء حساب جديد</p>
             </div>
 
             <div className="text-center">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
+              <Link
+                to="/"
                 className="text-gray-500 hover:text-gray-700 text-sm hover:underline"
               >
                 ← Back to Home
-              </button>
+              </Link>
             </div>
           </div>
         </form>
