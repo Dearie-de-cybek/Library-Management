@@ -32,11 +32,15 @@ const Home = () => {
         LibraryService.getFeaturedBooks()
       ]);
 
-      setScholars(scholarsData);
-      setBooks(booksData);
+      // Ensure we always set arrays, even if API returns something else
+      setScholars(Array.isArray(scholarsData) ? scholarsData : []);
+      setBooks(Array.isArray(booksData) ? booksData : []);
     } catch (err) {
       setError('Failed to load data. Please try again later.');
       console.error('Error loading home data:', err);
+      // Set empty arrays on error
+      setScholars([]);
+      setBooks([]);
     } finally {
       setLoading(false);
     }

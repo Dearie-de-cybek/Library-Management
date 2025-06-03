@@ -40,8 +40,18 @@ const authReducer = (state, action) => {
         isAuthenticated: true, 
         loading: false 
       };
+    case 'LOAD_USER_FAILURE':
+      return { 
+        ...state, 
+        isAuthenticated: false, 
+        loading: false,
+        user: null,
+        token: null
+      };
     case 'CLEAR_ERROR':
       return { ...state, error: null };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
     default:
       return state;
   }
@@ -51,7 +61,7 @@ const initialState = {
   user: null,
   token: localStorage.getItem('authToken'),
   isAuthenticated: false,
-  loading: true,
+  loading: false, // Changed to false to allow public access immediately
   error: null
 };
 
@@ -63,17 +73,21 @@ export const AuthProvider = ({ children }) => {
     if (state.token) {
       loadUser();
     } else {
-      dispatch({ type: 'LOGOUT' });
+      // No token, set to not authenticated but not loading
+      dispatch({ type: 'LOAD_USER_FAILURE' });
     }
   }, []);
 
   const loadUser = async () => {
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const user = await LibraryService.getCurrentUser();
       dispatch({ type: 'LOAD_USER', payload: user });
     } catch (error) {
       console.error('Error loading user:', error);
-      logout();
+      // Remove invalid token and continue as guest
+      localStorage.removeItem('authToken');
+      dispatch({ type: 'LOAD_USER_FAILURE' });
     }
   };
 
@@ -81,12 +95,17 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await LibraryService.login(credentials);
+      const token = response.data?.token || response.token;
+      const user = response.data?.user || response.user;
+      
+      // Store token in localStorage
+      if (token) {
+        localStorage.setItem('authToken', token);
+      }
+      
       dispatch({ 
         type: 'LOGIN_SUCCESS', 
-        payload: {
-          user: response.data?.user || response.user,
-          token: response.data?.token || response.token
-        }
+        payload: { user, token }
       });
       return response;
     } catch (error) {
@@ -99,12 +118,17 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: 'LOGIN_START' });
     try {
       const response = await LibraryService.register(userData);
+      const token = response.data?.token || response.token;
+      const user = response.data?.user || response.user;
+      
+      // Store token in localStorage
+      if (token) {
+        localStorage.setItem('authToken', token);
+      }
+      
       dispatch({ 
         type: 'LOGIN_SUCCESS', 
-        payload: {
-          user: response.data?.user || response.user,
-          token: response.data?.token || response.token
-        }
+        payload: { user, token }
       });
       return response;
     } catch (error) {
@@ -115,10 +139,13 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      // Try to call logout API, but don't fail if it doesn't work
       await LibraryService.logout();
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      // Always clear local storage and state
+      localStorage.removeItem('authToken');
       dispatch({ type: 'LOGOUT' });
     }
   };

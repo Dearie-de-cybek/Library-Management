@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
@@ -12,7 +11,7 @@ const BooksPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('downloads');
-  const [viewMode, setViewMode] = useState('grid'); 
+  const [viewMode, setViewMode] = useState('grid'); // grid or list
 
   useEffect(() => {
     loadBooks();
@@ -22,9 +21,12 @@ const BooksPage = () => {
     try {
       setLoading(true);
       const data = await LibraryService.getFeaturedBooks();
-      setBooks(data);
+      // Ensure we always set an array, even if API returns something else
+      setBooks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading books:', error);
+      // Set empty array on error
+      setBooks([]);
     } finally {
       setLoading(false);
     }
@@ -38,20 +40,20 @@ const BooksPage = () => {
     setSelectedBook(null);
   };
 
-  // Filter and sort books
-  const filteredBooks = books
+  // Filter and sort books with safety check
+  const filteredBooks = (Array.isArray(books) ? books : [])
     .filter(book => {
-      const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           book.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = book.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           book.author?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           book.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || book.category === selectedCategory;
       return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
-      if (sortBy === 'downloads') return b.downloads - a.downloads;
-      if (sortBy === 'title') return a.title.localeCompare(b.title);
-      if (sortBy === 'author') return a.author.localeCompare(b.author);
-      if (sortBy === 'year') return b.publishedYear - a.publishedYear;
+      if (sortBy === 'downloads') return (b.downloads || 0) - (a.downloads || 0);
+      if (sortBy === 'title') return (a.title || '').localeCompare(b.title || '');
+      if (sortBy === 'author') return (a.author || '').localeCompare(b.author || '');
+      if (sortBy === 'year') return (b.publishedYear || 0) - (a.publishedYear || 0);
       return 0;
     });
 
@@ -65,8 +67,8 @@ const BooksPage = () => {
     return count.toString();
   };
 
-  // Get categories from actual book data
-  const categories = [...new Set(books.map(book => book.category))].sort();
+  // Get categories from actual book data with safety check
+  const categories = [...new Set((Array.isArray(books) ? books : []).map(book => book.category).filter(Boolean))].sort();
 
   if (loading) {
     return <LoadingScreen />;
@@ -155,7 +157,7 @@ const BooksPage = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-emerald-700 font-medium">
-                {filteredBooks.length} books out of {books.length}
+                {filteredBooks.length} books out of {Array.isArray(books) ? books.length : 0}
               </span>
             </div>
 

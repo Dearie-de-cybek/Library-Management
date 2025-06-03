@@ -23,9 +23,12 @@ const ScholarsPage = () => {
     try {
       setLoading(true);
       const data = await LibraryService.getScholars();
-      setScholars(data);
+      // Ensure we always set an array, even if API returns something else
+      setScholars(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error loading scholars:', error);
+      // Set empty array on error
+      setScholars([]);
     } finally {
       setLoading(false);
     }
@@ -53,24 +56,24 @@ const ScholarsPage = () => {
     setScholarWorks([]);
   };
 
-  // Filter and sort scholars
-  const filteredScholars = scholars
+  // Filter and sort scholars with safety check
+  const filteredScholars = (Array.isArray(scholars) ? scholars : [])
     .filter(scholar => {
-      const matchesSearch = scholar.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           scholar.specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           scholar.institution.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = scholar.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           scholar.specialization?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           scholar.institution?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSpecialization = selectedSpecialization === 'all' || 
                                    scholar.specialization === selectedSpecialization;
       return matchesSearch && matchesSpecialization;
     })
     .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'works') return b.worksCount - a.worksCount;
-      if (sortBy === 'institution') return a.institution.localeCompare(b.institution);
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'works') return (b.worksCount || 0) - (a.worksCount || 0);
+      if (sortBy === 'institution') return (a.institution || '').localeCompare(b.institution || '');
       return 0;
     });
 
-  const specializations = [...new Set(scholars.map(s => s.specialization))];
+  const specializations = [...new Set((Array.isArray(scholars) ? scholars : []).map(s => s.specialization).filter(Boolean))];
 
   if (loading) {
     return <LoadingScreen />;
@@ -163,7 +166,7 @@ const ScholarsPage = () => {
           className="text-center mb-8"
         >
           <p className="text-emerald-700 font-medium">
-            Found {filteredScholars.length} scholars out of {scholars.length}
+            Found {filteredScholars.length} scholars out of {Array.isArray(scholars) ? scholars.length : 0}
           </p>
         </motion.div>
 
