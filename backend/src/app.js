@@ -100,7 +100,6 @@ app.get('/api', (req, res) => {
       'User Authentication & Authorization',
       'Book Management with Islamic Categories',
       'Scholar Profiles & Works',
-      'Download Tracking & Analytics',
       'File Upload Support',
       'Advanced Search & Filtering',
       'Multi-language Support (Arabic/English)'

@@ -6,7 +6,6 @@ const userRoutes = require('./users');
 const bookRoutes = require('./books');
 const scholarRoutes = require('./scholars');
 const downloadRoutes = require('./downloads');
-const analyticsRoutes = require('./analytics');
 
 // Import models for categories endpoint
 const { Category } = require('../models');
@@ -28,7 +27,6 @@ router.get('/', (req, res) => {
       books: '/api/books',
       scholars: '/api/scholars',
       downloads: '/api/downloads',
-      analytics: '/api/analytics',
       categories: '/api/categories'
     },
     documentation: '/api/docs',
@@ -90,6 +88,5 @@ router.use('/users', userRoutes);
 router.use('/books', bookRoutes);
 router.use('/scholars', scholarRoutes);
 router.use('/downloads', downloadRoutes);
-router.use('/analytics', analyticsRoutes);
 
 module.exports = router;
