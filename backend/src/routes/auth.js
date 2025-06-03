@@ -2,7 +2,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 
 // Import controllers
-const { authController } = require('../controllers');
+const { authController } = require('../controllers')
 
 // Import middleware
 const {
