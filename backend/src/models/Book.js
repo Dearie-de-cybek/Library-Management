@@ -144,18 +144,15 @@ const bookSchema = new mongoose.Schema({
   language: {
     type: String,
     required: true,
-    enum: ['العربية', 'English', 'Français', 'Deutsch', 'اردو', 'فارسی', 'Türkçe'],
+    enum: ['English'],
     default: 'English'
   },
   
   isbn: {
     type: String,
     trim: true,
-    sparse: true,
-    validate: {
-      validator: validateISBN,
-      message: 'Please enter a valid ISBN-10 or ISBN-13'
-    }
+    sparse: true
+    // No validation - completely optional
   },
   
   publisher: {

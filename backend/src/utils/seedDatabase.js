@@ -159,26 +159,26 @@ const sampleScholars = [
 
 const sampleBooks = [
   {
-    title: 'فهم القرآن الكريم في عصر التكنولوجيا',
-    author: 'د. أحمد الزهراني',
+    title: 'Understanding the Quran in the Technology Era',
+    author: 'Dr. Ahmed Al-Zahrani',
     category: 'Qur\'an, Special parts and chapters, Works about the Qur\'an.',
-    description: 'دراسة معاصرة لكيفية فهم وتطبيق تعاليم القرآن الكريم في العصر الحديث، مع التركيز على التحديات التكنولوجية والاجتماعية المعاصرة.',
+    description: 'A contemporary study on how to understand and apply the teachings of the Holy Quran in the modern era, focusing on technological and social challenges of our time.',
     coverImage: 'https://example.com/quran-tech.jpg',
     publishedYear: 2023,
     pages: 450,
-    language: 'العربية',
-    isbn: '978-0-13-235088-4', // Valid ISBN-13
-    publisher: 'دار الفكر العربي',
-    tags: ['القرآن', 'التكنولوجيا', 'العصر الحديث', 'التفسير'],
+    language: 'English',
+    isbn: '978-0-13-235088-4',
+    publisher: 'Arab Thought Publishing House',
+    tags: ['Quran', 'Technology', 'Modern Era', 'Interpretation'],
     downloads: 320,
     bookFile: {
       filename: 'quran-tech-2023.pdf',
-      originalName: 'فهم_القرآن_الكريم_في_عصر_التكنولوجيا.pdf',
+      originalName: 'Understanding_Quran_Technology_Era.pdf',
       size: 15728640, // 15MB
       mimetype: 'application/pdf',
       path: 'uploads/books/quran-tech-2023.pdf'
     },
-    searchKeywords: ['quran', 'technology', 'modern', 'interpretation', 'قرآن', 'تكنولوجيا'],
+    searchKeywords: ['quran', 'technology', 'modern', 'interpretation'],
     isActive: true,
     views: 850
   },
@@ -191,7 +191,7 @@ const sampleBooks = [
     publishedYear: 2022,
     pages: 680,
     language: 'English',
-    isbn: '978-1-86197-876-9', // Valid ISBN-13
+    isbn: '978-1-86197-876-9',
     publisher: 'Islamic Academic Press',
     tags: ['Hadith', 'Authentication', 'Methodology', 'Scholarship'],
     downloads: 280,
@@ -207,26 +207,26 @@ const sampleBooks = [
     views: 650
   },
   {
-    title: 'السيرة النبوية للأطفال',
-    author: 'د. فاطمة الزهراء',
+    title: 'Prophet Biography for Children',
+    author: 'Dr. Fatima Al-Zahra',
     category: 'Prophet Muhammad (SAW).',
-    description: 'سيرة مبسطة ومصورة للنبي محمد صلى الله عليه وسلم، مكتوبة خصيصاً للأطفال مع قصص ملهمة وأخلاق نبوية.',
+    description: 'A simplified and illustrated biography of Prophet Muhammad (peace be upon him), written especially for children with inspiring stories and prophetic morals.',
     coverImage: 'https://example.com/seerah-kids.jpg',
     publishedYear: 2024,
     pages: 180,
-    language: 'العربية',
-    isbn: '978-0-321-12345-7', // Valid ISBN-13
-    publisher: 'دار الطفل المسلم',
-    tags: ['السيرة النبوية', 'الأطفال', 'القصص', 'الأخلاق'],
+    language: 'English',
+    isbn: '978-0-321-12345-7',
+    publisher: 'Muslim Child Publishing House',
+    tags: ['Prophet Biography', 'Children', 'Stories', 'Morals'],
     downloads: 520,
     bookFile: {
       filename: 'seerah-kids-2024.pdf',
-      originalName: 'السيرة_النبوية_للأطفال.pdf',
+      originalName: 'Prophet_Biography_for_Children.pdf',
       size: 12582912, // 12MB
       mimetype: 'application/pdf',
       path: 'uploads/books/seerah-kids-2024.pdf'
     },
-    searchKeywords: ['seerah', 'children', 'prophet', 'muhammad', 'stories', 'سيرة', 'أطفال'],
+    searchKeywords: ['seerah', 'children', 'prophet', 'muhammad', 'stories'],
     isActive: true,
     views: 920,
     isFeatured: true
@@ -240,7 +240,7 @@ const sampleBooks = [
     publishedYear: 2023,
     pages: 350,
     language: 'English',
-    isbn: '978-0-596-52068-7', // Valid ISBN-13
+    isbn: '978-0-596-52068-7',
     publisher: 'University of Islamic Studies Press',
     tags: ['Philosophy', 'Islamic Thought', 'Classical Period', 'Contemporary'],
     downloads: 195,
@@ -256,30 +256,29 @@ const sampleBooks = [
     views: 420
   },
   {
-    title: 'مقاصد الشريعة الإسلامية',
-    author: 'د. عبد الرحمن الشاطبي',
+    title: 'Objectives of Islamic Law',
+    author: 'Dr. Abdul Rahman Al-Shatibi',
     category: 'General works on Islam.',
-    description: 'دراسة شاملة لمقاصد الشريعة الإسلامية وأثرها في الاجتهاد الفقهي المعاصر، مع تطبيقات عملية في القضايا المعاصرة.',
+    description: 'A comprehensive study of the objectives of Islamic law and their impact on contemporary jurisprudential reasoning, with practical applications in contemporary issues.',
     coverImage: 'https://example.com/maqasid.jpg',
     publishedYear: 2023,
     pages: 520,
-    language: 'العربية',
-    isbn: '978-1-449-39470-4', // Valid ISBN-13
-    publisher: 'دار المقاصد',
-    tags: ['مقاصد الشريعة', 'الفقه', 'الاجتهاد', 'القضايا المعاصرة'],
+    language: 'English',
+    isbn: '978-1-449-39470-4',
+    publisher: 'Objectives Publishing House',
+    tags: ['Islamic Law Objectives', 'Jurisprudence', 'Legal Reasoning', 'Contemporary Issues'],
     downloads: 380,
     bookFile: {
       filename: 'maqasid-2023.pdf',
-      originalName: 'مقاصد_الشريعة_الإسلامية.pdf',
+      originalName: 'Objectives_of_Islamic_Law.pdf',
       size: 22020096, // 21MB
       mimetype: 'application/pdf',
       path: 'uploads/books/maqasid-2023.pdf'
     },
-    searchKeywords: ['maqasid', 'sharia', 'jurisprudence', 'fiqh', 'contemporary', 'شريعة', 'فقه'],
+    searchKeywords: ['maqasid', 'sharia', 'jurisprudence', 'fiqh', 'contemporary'],
     isActive: true,
     views: 720
   },
-  // Additional book with ISBN-10 for testing
   {
     title: 'Principles of Islamic Finance',
     author: 'Dr. Abdullah Khan',
@@ -289,7 +288,7 @@ const sampleBooks = [
     publishedYear: 2023,
     pages: 400,
     language: 'English',
-    isbn: '0-13-110362-8', // Valid ISBN-10
+    isbn: '0-13-110362-8',
     publisher: 'Islamic Finance Publications',
     tags: ['Islamic Finance', 'Banking', 'Sharia Compliance', 'Economics'],
     downloads: 240,
@@ -304,7 +303,6 @@ const sampleBooks = [
     isActive: true,
     views: 380
   },
-  // Book without ISBN for testing
   {
     title: 'Contemporary Islamic Art',
     author: 'Dr. Amina Hassan',
@@ -314,7 +312,6 @@ const sampleBooks = [
     publishedYear: 2024,
     pages: 280,
     language: 'English',
-    // isbn: '', // No ISBN - testing optional field
     publisher: 'Arts & Culture Press',
     tags: ['Islamic Art', 'Contemporary', 'Culture', 'Expression'],
     downloads: 160,
