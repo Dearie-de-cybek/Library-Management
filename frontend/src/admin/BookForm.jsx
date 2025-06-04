@@ -12,7 +12,7 @@ const BookForm = ({ onSuccess }) => {
     coverImage: '',
     publishedYear: '',
     pages: '',
-    language: 'English', // Fixed: Changed from Arabic to English
+    language: 'English',
     isbn: '',
     publisher: '',
     tags: [],
@@ -24,6 +24,11 @@ const BookForm = ({ onSuccess }) => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
+  
+  // New state for book file upload
+  const [bookFile, setBookFile] = useState(null);
+  const [bookFilePreview, setBookFilePreview] = useState('');
+  const [uploadingBookFile, setUploadingBookFile] = useState(false);
 
   // Fixed Islamic categories as specified
   const islamicCategories = [
@@ -58,7 +63,6 @@ const BookForm = ({ onSuccess }) => {
     'Black Muslims.'
   ];
 
-  // Fixed: Only English as per backend model
   const languages = ['English'];
 
   const handleInputChange = (e) => {
@@ -67,7 +71,6 @@ const BookForm = ({ onSuccess }) => {
       ...prev,
       [name]: value
     }));
-    // Clear errors when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -80,7 +83,6 @@ const BookForm = ({ onSuccess }) => {
       const img = new Image();
       
       img.onload = () => {
-        // Calculate new dimensions while maintaining aspect ratio
         let { width, height } = img;
         
         if (width > height) {
@@ -98,7 +100,6 @@ const BookForm = ({ onSuccess }) => {
         canvas.width = width;
         canvas.height = height;
         
-        // Draw and compress
         ctx.drawImage(img, 0, 0, width, height);
         const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
         resolve(compressedBase64);
@@ -112,13 +113,11 @@ const BookForm = ({ onSuccess }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setErrors(prev => ({ ...prev, coverImage: 'Please select a valid image file' }));
       return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setErrors(prev => ({ ...prev, coverImage: 'Image size should be less than 5MB' }));
       return;
@@ -128,14 +127,12 @@ const BookForm = ({ onSuccess }) => {
     setImageFile(file);
 
     try {
-      // Resize and compress the image (book covers are typically taller)
       const compressedBase64 = await resizeImage(file, 400, 600, 0.8);
       
-      // Check compressed size
-      const compressedSize = compressedBase64.length * 0.75; // Approximate size
+      const compressedSize = compressedBase64.length * 0.75;
       console.log('Original file size:', file.size, 'Compressed size:', compressedSize);
       
-      if (compressedSize > 500 * 1024) { // If still larger than 500KB, compress more
+      if (compressedSize > 500 * 1024) {
         const smallerBase64 = await resizeImage(file, 300, 450, 0.6);
         setImagePreview(smallerBase64);
         setFormData(prev => ({ ...prev, coverImage: smallerBase64 }));
@@ -146,7 +143,6 @@ const BookForm = ({ onSuccess }) => {
       
       setUploadingImage(false);
       
-      // Clear any previous image errors
       if (errors.coverImage) {
         setErrors(prev => ({ ...prev, coverImage: '' }));
       }
@@ -157,12 +153,64 @@ const BookForm = ({ onSuccess }) => {
     }
   };
 
+  // NEW: Handle book file upload
+  const handleBookFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type (PDF only)
+    if (file.type !== 'application/pdf') {
+      setErrors(prev => ({ ...prev, bookFile: 'Please select a PDF file only' }));
+      return;
+    }
+
+    // Validate file size (max 50MB for PDF)
+    if (file.size > 50 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, bookFile: 'PDF file size should be less than 50MB' }));
+      return;
+    }
+
+    setUploadingBookFile(true);
+    setBookFile(file);
+
+    // Create preview info
+    setBookFilePreview({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      formattedSize: formatFileSize(file.size)
+    });
+
+    setUploadingBookFile(false);
+
+    // Clear any previous errors
+    if (errors.bookFile) {
+      setErrors(prev => ({ ...prev, bookFile: '' }));
+    }
+  };
+
+  // Helper function to format file size
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const removeImage = () => {
     setImageFile(null);
     setImagePreview('');
     setFormData(prev => ({ ...prev, coverImage: '' }));
-    // Reset the file input
     const fileInput = document.getElementById('book-cover-image');
+    if (fileInput) fileInput.value = '';
+  };
+
+  // NEW: Remove book file
+  const removeBookFile = () => {
+    setBookFile(null);
+    setBookFilePreview('');
+    const fileInput = document.getElementById('book-pdf-file');
     if (fileInput) fileInput.value = '';
   };
 
@@ -193,9 +241,40 @@ const BookForm = ({ onSuccess }) => {
     if (!formData.publishedYear) newErrors.publishedYear = 'Publication year is required';
     if (!formData.pages || formData.pages < 1) newErrors.pages = 'Number of pages is required';
     if (!formData.coverImage.trim()) newErrors.coverImage = 'Book cover image is required';
+    
+    // NEW: Validate book file
+    if (!bookFile) newErrors.bookFile = 'Book PDF file is required';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // NEW: Upload book file to server
+  const uploadBookFileToServer = async (bookId) => {
+    if (!bookFile || !bookId) return null;
+
+    const formData = new FormData();
+    formData.append('bookFile', bookFile);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'}/books/${bookId}/upload-book`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload book file');
+      }
+
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.error('Error uploading book file:', error);
+      throw error;
+    }
   };
 
   const handleSubmit = async () => {
@@ -206,7 +285,6 @@ const BookForm = ({ onSuccess }) => {
     setErrors({});
     
     try {
-      // Check authentication first
       const authToken = localStorage.getItem('authToken');
       console.log('Auth token exists:', !!authToken);
       
@@ -222,12 +300,11 @@ const BookForm = ({ onSuccess }) => {
         coverImage: formData.coverImage,
         publishedYear: parseInt(formData.publishedYear, 10),
         pages: parseInt(formData.pages, 10),
-        language: formData.language, // This should be 'English'
+        language: formData.language,
         tags: formData.tags,
         searchKeywords: formData.tags
       };
 
-      // Add optional fields only if they have values
       if (formData.isbn && formData.isbn.trim()) {
         bookData.isbn = formData.isbn.trim();
       }
@@ -236,20 +313,23 @@ const BookForm = ({ onSuccess }) => {
         bookData.publisher = formData.publisher.trim();
       }
 
-      // Check payload size
-      const payloadSize = JSON.stringify(bookData).length;
-      console.log('Payload size:', payloadSize, 'bytes');
-
-      // Log the exact payload being sent
-      console.log('=== BOOK DATA BEING SENT ===');
-      console.log(JSON.stringify({
-        ...bookData,
-        coverImage: bookData.coverImage ? `[IMAGE_DATA_${bookData.coverImage.length}_CHARS]` : 'NO_IMAGE'
-      }, null, 2));
-      console.log('=== END PAYLOAD ===');
-
+      console.log('Creating book...');
       const response = await LibraryService.createBook(bookData);
       console.log('Book created successfully:', response);
+      
+      // Get the book ID from the response
+      const bookId = response._id || response.id;
+      
+      if (!bookId) {
+        throw new Error('Book created but no ID returned');
+      }
+
+      // NEW: Upload the book file
+      if (bookFile) {
+        console.log('Uploading book file...');
+        await uploadBookFileToServer(bookId);
+        console.log('Book file uploaded successfully');
+      }
       
       // Reset form
       setFormData({
@@ -267,12 +347,12 @@ const BookForm = ({ onSuccess }) => {
         customTag: ''
       });
       removeImage();
+      removeBookFile();
       setErrors({});
-      setSuccessMessage('Book added successfully!');
+      setSuccessMessage('Book and file uploaded successfully!');
       
       if (onSuccess) onSuccess();
       
-      // Clear success message after 5 seconds
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
       console.error('Error creating book:', error);
@@ -288,9 +368,9 @@ const BookForm = ({ onSuccess }) => {
       } else if (error.message.includes('403')) {
         errorMessage = 'Permission denied: Admin access required';
       } else if (error.message.includes('Payload too large')) {
-        errorMessage = 'Image is too large. Try uploading a smaller image.';
+        errorMessage = 'Files are too large. Try uploading smaller files.';
       } else if (error.message.includes('timeout')) {
-        errorMessage = 'Request timeout. The image might be too large. Try a smaller image.';
+        errorMessage = 'Request timeout. The files might be too large. Try smaller files.';
       } else if (error.message) {
         errorMessage = error.message;
       }
@@ -298,21 +378,6 @@ const BookForm = ({ onSuccess }) => {
       setErrors({ submit: errorMessage });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmitWithoutImage = async () => {
-    // Temporarily remove image and submit
-    const originalImage = formData.coverImage;
-    setFormData(prev => ({ ...prev, coverImage: '' }));
-    
-    try {
-      await handleSubmit();
-    } finally {
-      // Restore image if submission failed
-      if (originalImage) {
-        setFormData(prev => ({ ...prev, coverImage: originalImage }));
-      }
     }
   };
 
@@ -456,13 +521,84 @@ const BookForm = ({ onSuccess }) => {
             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
           </div>
 
+          {/* NEW: Book PDF File Upload */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Book PDF File *
+            </label>
+            
+            <div className="space-y-4">
+              {!bookFilePreview ? (
+                <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
+                  <div className="space-y-2">
+                    <svg className="mx-auto h-12 w-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10m-3-3l3 3m-3 3l3-3m2 5h6m-6-5h6m2-7H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2z" />
+                    </svg>
+                    <div className="text-sm text-gray-600">
+                      <label htmlFor="book-pdf-file" className="cursor-pointer">
+                        <span className="mt-2 block text-sm font-medium text-blue-600 hover:text-blue-500">
+                          Click to upload book PDF file
+                        </span>
+                        <span className="block text-xs text-gray-500 mt-1">
+                          PDF files only, up to 50MB
+                        </span>
+                      </label>
+                      <input
+                        id="book-pdf-file"
+                        type="file"
+                        className="sr-only"
+                        accept="application/pdf"
+                        onChange={handleBookFileUpload}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                    <div className="w-16 h-16 bg-red-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-8 h-8 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-800">
+                        {bookFilePreview.name}
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        PDF • {bookFilePreview.formattedSize}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeBookFile}
+                      className="text-red-600 hover:text-red-800 p-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {uploadingBookFile && (
+                <div className="flex items-center justify-center py-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                  <span className="ml-2 text-sm text-blue-600">Processing PDF file...</span>
+                </div>
+              )}
+
+              {errors.bookFile && <p className="text-red-500 text-sm">{errors.bookFile}</p>}
+            </div>
+          </div>
+
           {/* Book Cover Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Book Cover Image *
             </label>
             
-            {/* Upload Area */}
             <div className="space-y-4">
               {!imagePreview ? (
                 <div className="border-2 border-dashed border-blue-300 rounded-xl p-6 text-center hover:border-blue-400 transition-colors duration-200">
@@ -612,7 +748,6 @@ const BookForm = ({ onSuccess }) => {
               Keywords & Tags
             </label>
             
-            {/* Add Tag Input */}
             <div className="flex gap-2 mb-4">
               <input
                 type="text"
@@ -637,7 +772,6 @@ const BookForm = ({ onSuccess }) => {
               </button>
             </div>
 
-            {/* Display Tags */}
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, index) => (
@@ -665,23 +799,9 @@ const BookForm = ({ onSuccess }) => {
 
           {/* Submit Button */}
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
-            {/* Try without image button - shown when there's an image and there was an error */}
-            {formData.coverImage && errors.submit && (
-              <button
-                onClick={handleSubmitWithoutImage}
-                disabled={loading || uploadingImage}
-                className="bg-amber-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-amber-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                Try Without Image
-              </button>
-            )}
-            
             <button
               onClick={handleSubmit}
-              disabled={loading || uploadingImage}
+              disabled={loading || uploadingImage || uploadingBookFile}
               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (

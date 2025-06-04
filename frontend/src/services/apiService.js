@@ -16,6 +16,14 @@ class ApiService {
     };
   }
 
+  // Helper method to get auth headers for file uploads (no Content-Type)
+  getFileUploadHeaders() {
+    const token = localStorage.getItem('authToken');
+    return {
+      ...(token && { Authorization: `Bearer ${token}` })
+    };
+  }
+
   // Generic API call method
   async apiCall(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
@@ -204,6 +212,62 @@ class ApiService {
 
   async deleteBook(id) {
     return this.apiCall(`/books/${id}`, { method: 'DELETE' });
+  }
+
+  // NEW: Upload book file method
+  async uploadBookFile(bookId, file) {
+    const url = `${this.baseURL}/books/${bookId}/upload-book`;
+    console.log('Uploading book file to:', url);
+    
+    const formData = new FormData();
+    formData.append('bookFile', file);
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getFileUploadHeaders(), // No Content-Type for FormData
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to upload book file: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Book file upload error:', error);
+      throw error;
+    }
+  }
+
+  // NEW: Upload cover image method
+  async uploadCoverImage(bookId, file) {
+    const url = `${this.baseURL}/books/${bookId}/upload-cover`;
+    console.log('Uploading cover image to:', url);
+    
+    const formData = new FormData();
+    formData.append('coverImage', file);
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: this.getFileUploadHeaders(), // No Content-Type for FormData
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to upload cover image: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Cover image upload error:', error);
+      throw error;
+    }
   }
 
   // Scholars Methods

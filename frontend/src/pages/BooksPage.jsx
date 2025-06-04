@@ -44,11 +44,30 @@ const BooksPage = () => {
     setSelectedBook(null);
   };
 
-  const handleDownloadBook = async (bookId) => {
-    if (!bookId) return;
+  // FIXED: Updated download function with proper ID handling and user authentication check
+  const handleDownloadBook = async (book) => {
+    if (!book) {
+      alert('Book information not available');
+      return;
+    }
+
+    // Check if user is logged in
+    if (!user) {
+      alert('Please log in to download books');
+      return;
+    }
+    
+    // Get the correct book ID (try both _id and id)
+    const bookId = book._id || book.id;
+    if (!bookId) {
+      alert('Book ID not found');
+      return;
+    }
     
     try {
       setDownloadLoading(true);
+      
+      console.log('Downloading book:', bookId);
       
       // Call the download API
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'}/downloads/book/${bookId}`, {
@@ -59,13 +78,18 @@ const BooksPage = () => {
         }
       });
 
+      console.log('Download response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to download book');
+        const errorText = await response.text();
+        console.error('Download failed:', errorText);
+        throw new Error(`Failed to download book: ${response.status} ${response.statusText}`);
       }
 
-      // Get filename from response headers
+      // Get filename from response headers or use book title
       const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = selectedBook?.title + '.pdf';
+      let filename = `${book.title || 'Islamic_Book'}.pdf`;
+      
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
         if (filenameMatch) {
@@ -87,27 +111,39 @@ const BooksPage = () => {
 
       // Update book download count in local state
       setBooks(prevBooks => 
-        prevBooks.map(book => 
-          book.id === bookId 
-            ? { ...book, downloads: (book.downloads || 0) + 1 }
-            : book
+        prevBooks.map(b => 
+          (b._id || b.id) === bookId 
+            ? { ...b, downloads: (b.downloads || 0) + 1 }
+            : b
         )
       );
 
       // Update selected book if it's the one being downloaded
-      if (selectedBook && selectedBook.id === bookId) {
+      if (selectedBook && (selectedBook._id || selectedBook.id) === bookId) {
         setSelectedBook(prev => ({
           ...prev,
           downloads: (prev.downloads || 0) + 1
         }));
       }
 
-      // Show success message (you can replace with a toast notification)
-      alert('Book downloaded successfully!');
+      // Show success message
+      alert(`"${book.title}" downloaded successfully!`);
 
     } catch (error) {
       console.error('Download error:', error);
-      alert('Failed to download book. Please try again.');
+      
+      // More specific error messages
+      if (error.message.includes('401')) {
+        alert('You need to log in again to download this book');
+      } else if (error.message.includes('403')) {
+        alert('You do not have permission to download this book');
+      } else if (error.message.includes('404')) {
+        alert('Book file not found on server');
+      } else if (error.message.includes('Network')) {
+        alert('Network error. Please check your connection and try again');
+      } else {
+        alert(`Failed to download book: ${error.message}`);
+      }
     } finally {
       setDownloadLoading(false);
     }
@@ -177,9 +213,13 @@ const BooksPage = () => {
           <p className="text-lg text-gray-700 max-w-4xl mx-auto">
             Discover our comprehensive collection of diverse Islamic books covering all aspects of Islamic sciences and religious knowledge
           </p>
-          {user && (
+          {user ? (
             <p className="text-sm text-emerald-600 mt-4">
               Welcome back, {user.name}! You can now download books.
+            </p>
+          ) : (
+            <p className="text-sm text-amber-600 mt-4">
+              Please log in to download books from our library.
             </p>
           )}
         </motion.div>
@@ -280,7 +320,7 @@ const BooksPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
               {filteredBooks.map((book, index) => (
                 <motion.div
-                  key={book.id}
+                  key={book._id || book.id || index}
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -337,7 +377,7 @@ const BooksPage = () => {
             <div className="space-y-6">
               {filteredBooks.map((book, index) => (
                 <motion.div
-                  key={book.id}
+                  key={book._id || book.id || index}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
@@ -485,7 +525,7 @@ const BooksPage = () => {
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">ISBN:</span>
-                        <p className="font-semibold text-sm">{selectedBook.isbn}</p>
+                        <p className="font-semibold text-sm">{selectedBook.isbn || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">Language:</span>
@@ -532,28 +572,34 @@ const BooksPage = () => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
-                      <button 
-                        onClick={() => handleDownloadBook(selectedBook.id)}
-                        disabled={downloadLoading}
-                        className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {downloadLoading ? (
-                          <>
-                            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25"></circle>
-                              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="opacity-75"></path>
-                            </svg>
-                            Downloading...
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                            Download Book
-                          </>
-                        )}
-                      </button>
+                      {user ? (
+                        <button 
+                          onClick={() => handleDownloadBook(selectedBook)}
+                          disabled={downloadLoading}
+                          className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {downloadLoading ? (
+                            <>
+                              <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25"></circle>
+                                <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="opacity-75"></path>
+                              </svg>
+                              Downloading...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                              </svg>
+                              Download Book
+                            </>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="flex-1 bg-gray-300 text-gray-600 py-3 px-6 rounded-xl font-bold text-center">
+                          Login Required to Download
+                        </div>
+                      )}
                       <button className="px-6 py-3 border-2 border-emerald-600 text-emerald-600 rounded-xl font-bold hover:bg-emerald-50 transition-all duration-200">
                         Preview
                       </button>
