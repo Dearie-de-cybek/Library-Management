@@ -19,6 +19,9 @@ const ScholarForm = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const specializations = [
     'Islamic Jurisprudence (Fiqh)',
@@ -48,6 +51,99 @@ const ScholarForm = ({ onSuccess }) => {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const resizeImage = (file, maxWidth = 400, maxHeight = 400, quality = 0.7) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height;
+            height = maxHeight;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedBase64);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, image: 'Please select a valid image file' }));
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+      return;
+    }
+
+    setUploadingImage(true);
+    setImageFile(file);
+
+    try {
+      // Resize and compress the image
+      const compressedBase64 = await resizeImage(file, 400, 400, 0.7);
+      
+      // Check compressed size
+      const compressedSize = compressedBase64.length * 0.75; // Approximate size
+      console.log('Original file size:', file.size, 'Compressed size:', compressedSize);
+      
+      if (compressedSize > 500 * 1024) { // If still larger than 500KB, compress more
+        const smallerBase64 = await resizeImage(file, 200, 200, 0.5);
+        setImagePreview(smallerBase64);
+        setFormData(prev => ({ ...prev, image: smallerBase64 }));
+      } else {
+        setImagePreview(compressedBase64);
+        setFormData(prev => ({ ...prev, image: compressedBase64 }));
+      }
+      
+      setUploadingImage(false);
+      
+      // Clear any previous image errors
+      if (errors.image) {
+        setErrors(prev => ({ ...prev, image: '' }));
+      }
+    } catch (error) {
+      console.error('Error processing image:', error);
+      setUploadingImage(false);
+      setErrors(prev => ({ ...prev, image: 'Error processing image. Please try a different image.' }));
+    }
+  };
+
+  const removeImage = () => {
+    setImageFile(null);
+    setImagePreview('');
+    setFormData(prev => ({ ...prev, image: '' }));
+    // Reset the file input
+    const fileInput = document.getElementById('scholar-image');
+    if (fileInput) fileInput.value = '';
   };
 
   const handleWorkChange = (index, field, value) => {
@@ -107,24 +203,52 @@ const ScholarForm = ({ onSuccess }) => {
     setErrors({});
     
     try {
+      // Check authentication first
+      const authToken = localStorage.getItem('authToken');
+      console.log('Auth token exists:', !!authToken);
+      
+      if (!authToken) {
+        throw new Error('You must be logged in to create a scholar');
+      }
+
+      // Prepare scholar data to match backend expectations exactly
       const scholarData = {
-        ...formData,
-        // Convert date strings to proper format if needed
+        name: formData.name.trim(),
+        title: formData.title.trim(),
+        specialization: formData.specialization,
+        bio: formData.bio.trim(),
         dateOfBirth: formData.dateOfBirth,
-        dateOfDeath: formData.dateOfDeath || null,
-        // Process works
+        isAlive: formData.isAlive,
         works: formData.works.map(work => ({
-          ...work,
-          year: parseInt(work.year),
-          downloads: 0 // New works start with 0 downloads
-        })),
-        // Add defaults
-        profileViews: 0,
-        totalBooksDownloads: 0,
-        booksCount: formData.works.length,
-        isFeatured: false,
-        isActive: true
+          title: work.title.trim(),
+          year: parseInt(work.year, 10)
+        }))
       };
+
+      // Add optional fields only if they have values
+      if (formData.institution && formData.institution.trim()) {
+        scholarData.institution = formData.institution.trim();
+      }
+
+      if (!formData.isAlive && formData.dateOfDeath) {
+        scholarData.dateOfDeath = formData.dateOfDeath;
+      }
+
+      if (formData.image) {
+        scholarData.image = formData.image;
+      }
+
+      // Check payload size
+      const payloadSize = JSON.stringify(scholarData).length;
+      console.log('Payload size:', payloadSize, 'bytes');
+
+      // Log the exact payload being sent
+      console.log('=== SCHOLAR DATA BEING SENT ===');
+      console.log(JSON.stringify({
+        ...scholarData,
+        image: scholarData.image ? `[IMAGE_DATA_${scholarData.image.length}_CHARS]` : 'NO_IMAGE'
+      }, null, 2));
+      console.log('=== END PAYLOAD ===');
 
       const response = await LibraryService.createScholar(scholarData);
       console.log('Scholar created successfully:', response);
@@ -142,6 +266,7 @@ const ScholarForm = ({ onSuccess }) => {
         image: '',
         works: [{ title: '', year: '', downloads: 0 }]
       });
+      removeImage();
       setErrors({});
       setSuccessMessage('Scholar added successfully!');
       
@@ -151,9 +276,67 @@ const ScholarForm = ({ onSuccess }) => {
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (error) {
       console.error('Error creating scholar:', error);
-      setErrors({ submit: error.message || 'Error occurred while adding scholar' });
+      console.error('Full error object:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Try to parse validation errors from backend
+      let errorMessage = 'Error occurred while adding scholar';
+      
+      if (error.message.includes('You must be logged in')) {
+        errorMessage = 'Authentication error: Please log in again';
+      } else if (error.message.includes('Validation failed')) {
+        errorMessage = 'Validation failed: Please check all fields and try again. Make sure you are logged in as an admin.';
+      } else if (error.message.includes('401')) {
+        errorMessage = 'Authentication error: Please log in as an admin';
+      } else if (error.message.includes('403')) {
+        errorMessage = 'Permission denied: Admin access required';
+      } else if (error.message.includes('Payload too large')) {
+        errorMessage = 'Image is too large. Try removing the image or uploading a smaller one.';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Request timeout. The image might be too large. Try without image.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setErrors({ submit: errorMessage });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSubmitWithoutImage = async () => {
+    // Temporarily remove image and submit
+    const originalImage = formData.image;
+    setFormData(prev => ({ ...prev, image: '' }));
+    
+    try {
+      await handleSubmit();
+    } finally {
+      // Restore image if submission failed
+      if (originalImage) {
+        setFormData(prev => ({ ...prev, image: originalImage }));
+      }
+    }
+  };
+
+  // Debug function to test API connection
+  const testApiConnection = async () => {
+    try {
+      console.log('Testing API connection...');
+      const token = localStorage.getItem('authToken');
+      console.log('Token exists:', !!token);
+      
+      // Test current user endpoint
+      const user = await LibraryService.getCurrentUser();
+      console.log('Current user:', user);
+      
+      alert('API connection successful! Check console for details.');
+    } catch (error) {
+      console.error('API test failed:', error);
+      alert('API connection failed: ' + error.message);
     }
   };
 
@@ -166,8 +349,20 @@ const ScholarForm = ({ onSuccess }) => {
       <div className="bg-white rounded-3xl shadow-lg border border-emerald-100 overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6">
-          <h2 className="text-2xl font-bold mb-2">Add New Islamic Scholar</h2>
-          <p className="text-emerald-100">Register a new scholar in the Islamic library</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Add New Islamic Scholar</h2>
+              <p className="text-emerald-100">Register a new scholar in the Islamic library</p>
+            </div>
+            {/* Debug button - remove in production */}
+            <button
+              type="button"
+              onClick={testApiConnection}
+              className="bg-white/20 text-white px-4 py-2 rounded-lg text-sm hover:bg-white/30 transition-colors"
+            >
+              Test API
+            </button>
+          </div>
         </div>
 
         {/* Success Message */}
@@ -350,19 +545,80 @@ const ScholarForm = ({ onSuccess }) => {
             )}
           </div>
 
-          {/* Image URL */}
+          {/* Scholar Image Upload */}
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Scholar Image URL
+              Scholar Image
             </label>
-            <input
-              type="url"
-              name="image"
-              value={formData.image}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-              placeholder="https://example.com/scholar-image.jpg"
-            />
+            
+            {/* Upload Area */}
+            <div className="space-y-4">
+              {!imagePreview ? (
+                <div className="border-2 border-dashed border-emerald-300 rounded-xl p-6 text-center hover:border-emerald-400 transition-colors duration-200">
+                  <div className="space-y-2">
+                    <svg className="mx-auto h-12 w-12 text-emerald-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <div className="text-sm text-gray-600">
+                      <label htmlFor="scholar-image" className="cursor-pointer">
+                        <span className="mt-2 block text-sm font-medium text-emerald-600 hover:text-emerald-500">
+                          Click to upload an image
+                        </span>
+                        <span className="block text-xs text-gray-500 mt-1">
+                          Images will be automatically resized and compressed
+                        </span>
+                        <span className="block text-xs text-gray-400 mt-1">
+                          PNG, JPG, GIF up to 5MB
+                        </span>
+                      </label>
+                      <input
+                        id="scholar-image"
+                        type="file"
+                        className="sr-only"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <img 
+                      src={imagePreview} 
+                      alt="Scholar preview" 
+                      className="w-20 h-20 object-cover rounded-lg border border-emerald-300"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-emerald-800">
+                        {imageFile?.name || 'Scholar image uploaded'}
+                      </p>
+                      <p className="text-xs text-emerald-600">
+                        {imageFile?.size ? `${(imageFile.size / 1024 / 1024).toFixed(2)} MB` : 'Image ready'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="text-red-600 hover:text-red-800 p-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {uploadingImage && (
+                <div className="flex items-center justify-center py-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-emerald-600"></div>
+                  <span className="ml-2 text-sm text-emerald-600">Processing image...</span>
+                </div>
+              )}
+
+              {errors.image && <p className="text-red-500 text-sm">{errors.image}</p>}
+            </div>
           </div>
 
           {/* Works Section */}
@@ -452,10 +708,24 @@ const ScholarForm = ({ onSuccess }) => {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end pt-6 border-t border-gray-200">
+          <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+            {/* Try without image button - shown when there's an image and there was an error */}
+            {formData.image && errors.submit && (
+              <button
+                onClick={handleSubmitWithoutImage}
+                disabled={loading || uploadingImage}
+                className="bg-amber-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-amber-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Try Without Image
+              </button>
+            )}
+            
             <button
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || uploadingImage}
               className="bg-gradient-to-r from-emerald-600 to-green-600 text-white px-8 py-3 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? (

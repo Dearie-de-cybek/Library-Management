@@ -59,23 +59,29 @@ const userSchema = new mongoose.Schema({
   },
   
   // Download history (last 10 downloads for quick access)
-  downloadHistory: [{
-    book: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Book'
-    },
-    downloadDate: {
-      type: Date,
-      default: Date.now
-    },
-    bookTitle: String // Denormalized for performance
-  }],
+  downloadHistory: {
+    type: [{
+      book: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Book'
+      },
+      downloadDate: {
+        type: Date,
+        default: Date.now
+      },
+      bookTitle: String // Denormalized for performance
+    }],
+    default: [] // Fixed: Ensure it's always an array
+  },
   
   // Recent downloads for admin view (last 5)
-  recentDownloads: [{
-    bookTitle: String,
-    date: String // Formatted date string
-  }],
+  recentDownloads: {
+    type: [{
+      bookTitle: String,
+      date: String // Formatted date string
+    }],
+    default: [] // Fixed: Ensure it's always an array
+  },
   
   // Password reset
   resetPasswordToken: String,
@@ -188,10 +194,15 @@ userSchema.pre(/^find/, function() {
   }
 });
 
-// Virtual for user's download count this month
+// Virtual for user's download count this month - FIXED
 userSchema.virtual('currentMonthDownloads').get(function() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  // Fixed: Add null check to prevent filter error
+  if (!this.downloadHistory || !Array.isArray(this.downloadHistory)) {
+    return 0;
+  }
   
   return this.downloadHistory.filter(download => 
     download.downloadDate >= startOfMonth

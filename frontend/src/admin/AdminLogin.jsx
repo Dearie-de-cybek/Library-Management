@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import LibraryService from '../services/dataService';
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -24,40 +26,55 @@ const AdminLoginPage = () => {
     if (error) setError('');
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!formData.email || !formData.password) {
-    setError('Please fill in all fields');
-    return;
-  }
-
-  setLoading(true);
-  setError('');
-
-  try {
-    const response = await LibraryService.login(formData);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // Check if user is admin
-    const user = response.data?.user || response.user;
-    if (user?.role !== 'admin') {
-      setError('Access denied. Administrator privileges required.');
-      await LibraryService.logout(); // Logout if not admin
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
       return;
     }
-    
-    // Option 1: Use window.location.href for immediate redirect with reload
-    window.location.href = '/admin';
-    
-    // Option 2: Alternative - navigate without reload (comment out option 1 if using this)
-    // navigate('/admin');
-    
-  } catch (error) {
-    setError(error.message || 'Admin login failed. Please check your credentials.');
-  } finally {
-    setLoading(false);
-  }
-};
+
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log('Attempting login with:', { email: formData.email });
+      
+      // Use the AuthContext login method instead of direct service call
+      const response = await login(formData);
+      console.log('Login response:', response);
+      
+      // Check if user is admin - try multiple possible response formats
+      const user = response?.data?.user || response?.user || response?.data;
+      console.log('User from response:', user);
+      
+      if (!user) {
+        setError('Login failed: No user data received from server.');
+        return;
+      }
+      
+      console.log('User role:', user.role);
+      
+      if (user.role !== 'admin') {
+        setError('Access denied. Administrator privileges required.');
+        await LibraryService.logout();
+        setLoading(false);
+        return;
+      }
+      
+      console.log('Admin login successful, redirecting to dashboard...');
+      
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        navigate('/admin', { replace: true });
+      }, 100);
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.message || 'Admin login failed. Please check your credentials.');
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-slate-100 to-gray-200 flex items-center justify-center p-4">

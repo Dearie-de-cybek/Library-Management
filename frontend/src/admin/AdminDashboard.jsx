@@ -9,7 +9,7 @@ import BookForm from './BookForm';
 import LibraryService from '../services/dataService';
 
 const AdminDashboard = () => {
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [stats, setStats] = useState({
@@ -20,40 +20,56 @@ const AdminDashboard = () => {
     recentActivity: []
   });
   const [loading, setLoading] = useState(true);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    checkAuthentication();
-  }, []);
+    console.log('AdminDashboard mounted');
+    console.log('Auth state:', { user, isAuthenticated, authLoading });
+    
+    // Wait for auth context to finish loading
+    if (!authLoading) {
+      checkAuthentication();
+    }
+  }, [authLoading, isAuthenticated, user]);
 
   useEffect(() => {
-    if (isAuthenticated && isAdmin()) {
+    if (authChecked && isAuthenticated && isAdmin()) {
+      console.log('Loading dashboard stats...');
       loadDashboardStats();
     }
-  }, [isAuthenticated]);
+  }, [authChecked, isAuthenticated]);
 
   const checkAuthentication = async () => {
+    console.log('Checking authentication...');
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('user:', user);
+    
     try {
       if (!isAuthenticated) {
-        navigate('/admin-login');
+        console.log('Not authenticated, redirecting to admin login');
+        navigate('/admin-login', { replace: true });
         return;
       }
 
+      console.log('User role:', user?.role);
       if (!isAdmin()) {
-        navigate('/');
+        console.log('User is not admin, redirecting to home');
+        navigate('/', { replace: true });
         return;
       }
       
-      setAuthLoading(false);
+      console.log('Authentication successful');
+      setAuthChecked(true);
     } catch (error) {
       console.error('Auth check error:', error);
-      navigate('/admin-login');
+      navigate('/admin-login', { replace: true });
     }
   };
 
   const loadDashboardStats = async () => {
     try {
       setLoading(true);
+      console.log('Loading dashboard stats...');
       
       // Try to get actual stats from backend
       const [booksData, scholarsData, usersData] = await Promise.all([
@@ -61,6 +77,8 @@ const AdminDashboard = () => {
         LibraryService.getScholars(),
         LibraryService.getAllUsers()
       ]);
+
+      console.log('Stats data:', { booksData, scholarsData, usersData });
 
       setStats({
         totalUsers: Array.isArray(usersData) ? usersData.length : 0,
@@ -104,7 +122,7 @@ const AdminDashboard = () => {
   );
 
   // Show loading while checking authentication
-  if (authLoading) {
+  if (authLoading || !authChecked) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-green-50 flex items-center justify-center">
         <motion.div

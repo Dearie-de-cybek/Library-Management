@@ -20,6 +20,7 @@ class ApiService {
   async apiCall(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     console.log('Making API call to:', url);
+    console.log('Headers:', this.getAuthHeaders());
     
     const config = {
       headers: this.getAuthHeaders(),
@@ -27,38 +28,84 @@ class ApiService {
     };
 
     try {
+      console.log('Sending request with config:', {
+        ...config,
+        body: config.body ? `${config.body.substring(0, 100)}...` : 'No body'
+      });
+
       const response = await fetch(url, config);
       console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
       
-      // Check if response is JSON
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error(`Server returned ${contentType || 'non-JSON'} instead of JSON. Check if backend is running.`);
+      let responseText = '';
+      let data = null;
+      
+      try {
+        responseText = await response.text();
+        console.log('Raw response length:', responseText.length);
+        console.log('Raw response preview:', responseText.substring(0, 500));
+        
+        if (responseText) {
+          data = JSON.parse(responseText);
+          console.log('Parsed data:', data);
+        }
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        console.error('Response text:', responseText);
+        throw new Error(`Server returned invalid response: ${responseText.substring(0, 200)}`);
       }
-      
-      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        
+        if (data && data.message) {
+          errorMessage = data.message;
+        } else if (data && data.error) {
+          errorMessage = data.error;
+        } else if (responseText && !responseText.includes('{')) {
+          // If response is not JSON (like HTML error page)
+          errorMessage = `Server error: ${responseText.substring(0, 200)}`;
+        }
+
+        console.error('API Error Details:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: url,
+          method: options.method || 'GET',
+          responsePreview: responseText.substring(0, 200)
+        });
+
+        throw new Error(errorMessage);
       }
 
       return data;
     } catch (error) {
-      console.error('API Error:', error);
-      console.error('URL attempted:', url);
+      console.error('API Call Error:', error);
+      console.error('URL:', url);
+      
+      // Handle network errors
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        throw new Error('Network error: Cannot connect to server. Please check if the backend is running.');
+      }
+      
+      // Handle timeout errors
+      if (error.name === 'AbortError') {
+        throw new Error('Request timeout: The server took too long to respond.');
+      }
+      
       throw error;
     }
   }
 
   // Auth Methods
   async register(userData) {
+    console.log('Registering user:', { ...userData, password: '[HIDDEN]' });
     const response = await this.apiCall('/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData)
     });
     
-    // Store token if registration successful
-    if (response.data?.token) {
+    if (response && response.data && response.data.token) {
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -68,13 +115,13 @@ class ApiService {
   }
 
   async login(credentials) {
+    console.log('Logging in user:', { ...credentials, password: '[HIDDEN]' });
     const response = await this.apiCall('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials)
     });
     
-    // Store token if login successful
-    if (response.data?.token) {
+    if (response && response.data && response.data.token) {
       localStorage.setItem('authToken', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -87,7 +134,6 @@ class ApiService {
     try {
       await this.apiCall('/auth/logout', { method: 'POST' });
     } finally {
-      // Clear local storage regardless of API call success
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
@@ -112,7 +158,7 @@ class ApiService {
     });
   }
 
-  // Books Methods - Match your backend exactly
+  // Books Methods
   async getBooks(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = `/books${queryString ? `?${queryString}` : ''}`;
@@ -124,7 +170,6 @@ class ApiService {
   }
 
   async getFeaturedBooks() {
-    // Your backend uses featured=true parameter
     return this.apiCall('/books?featured=true&limit=10');
   }
 
@@ -143,6 +188,7 @@ class ApiService {
   }
 
   async createBook(bookData) {
+    console.log('Creating book with data length:', JSON.stringify(bookData).length);
     return this.apiCall('/books', {
       method: 'POST',
       body: JSON.stringify(bookData)
@@ -160,7 +206,7 @@ class ApiService {
     return this.apiCall(`/books/${id}`, { method: 'DELETE' });
   }
 
-  // Scholars Methods - Match your backend exactly
+  // Scholars Methods
   async getScholars(params = {}) {
     const queryString = new URLSearchParams(params).toString();
     const endpoint = `/scholars${queryString ? `?${queryString}` : ''}`;
@@ -176,6 +222,15 @@ class ApiService {
   }
 
   async createScholar(scholarData) {
+    const payloadSize = JSON.stringify(scholarData).length;
+    console.log('Creating scholar - payload size:', payloadSize, 'bytes');
+    console.log('Auth token exists:', !!localStorage.getItem('authToken'));
+    
+    // Check payload size (limit to 10MB)
+    if (payloadSize > 10 * 1024 * 1024) {
+      throw new Error('Payload too large. Please reduce image size or remove image.');
+    }
+    
     return this.apiCall('/scholars', {
       method: 'POST',
       body: JSON.stringify(scholarData)
@@ -247,8 +302,6 @@ class ApiService {
 
   // Analytics Methods (Admin only)
   async getAdminStats() {
-    // This might need to be implemented in your backend
-    // For now, we'll try the dashboard endpoint
     return this.apiCall('/users/dashboard');
   }
 
@@ -281,14 +334,13 @@ class ApiService {
         body: JSON.stringify({ refreshToken })
       });
 
-      if (response.data?.token) {
+      if (response && response.data && response.data.token) {
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('refreshToken', response.data.refreshToken);
       }
 
       return response;
     } catch (error) {
-      // If refresh fails, clear tokens
       localStorage.removeItem('authToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
@@ -312,6 +364,5 @@ class ApiService {
   }
 }
 
-// Create and export a singleton instance
 const apiService = new ApiService();
 export default apiService;
