@@ -247,7 +247,7 @@ const UserManagement = () => {
               placeholder="Search for users..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+              className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
           </div>
 
@@ -255,7 +255,7 @@ const UserManagement = () => {
           <select
             value={filterBy}
             onChange={(e) => setFilterBy(e.target.value)}
-            className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 text-black focus:border-emerald-500"
           >
             <option value="all">All Users</option>
             <option value="active">Active Users</option>
@@ -267,7 +267,7 @@ const UserManagement = () => {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 text-black focus:ring-emerald-500 focus:border-emerald-500"
           >
             <option value="createdAt">Sort by Join Date</option>
             <option value="name">Sort by Name</option>

@@ -411,7 +411,7 @@ const ScholarForm = ({ onSuccess }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 text-black focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.name ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="e.g., Dr. Yusuf al-Qaradawi"
@@ -429,7 +429,7 @@ const ScholarForm = ({ onSuccess }) => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.title ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="e.g., Contemporary Islamic Scholar and Jurist"
@@ -447,7 +447,7 @@ const ScholarForm = ({ onSuccess }) => {
                 name="institution"
                 value={formData.institution}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                className="w-full px-4 py-3 border border-emerald-200 text-black rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                 placeholder="e.g., Al-Azhar University"
               />
             </div>
@@ -461,7 +461,7 @@ const ScholarForm = ({ onSuccess }) => {
                 name="specialization"
                 value={formData.specialization}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.specialization ? 'border-red-500' : 'border-emerald-200'
                 }`}
               >
@@ -484,7 +484,7 @@ const ScholarForm = ({ onSuccess }) => {
               value={formData.bio}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+              className={`w-full px-4 py-3 border text-black rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                 errors.bio ? 'border-red-500' : 'border-emerald-200'
               }`}
               placeholder="Write a comprehensive biography about the scholar and their contributions to Islamic sciences..."
@@ -504,7 +504,7 @@ const ScholarForm = ({ onSuccess }) => {
                 name="dateOfBirth"
                 value={formData.dateOfBirth}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                   errors.dateOfBirth ? 'border-red-500' : 'border-emerald-200'
                 }`}
               />
@@ -519,7 +519,7 @@ const ScholarForm = ({ onSuccess }) => {
                   name="isAlive"
                   checked={formData.isAlive}
                   onChange={handleInputChange}
-                  className="w-5 h-5 text-emerald-600 border-emerald-300 rounded focus:ring-emerald-500"
+                  className="w-5 h-5 text-emerald-600 text-black border-emerald-300 rounded focus:ring-emerald-500"
                 />
                 <span className="text-sm font-semibold text-gray-700">Still alive</span>
               </label>
@@ -536,7 +536,7 @@ const ScholarForm = ({ onSuccess }) => {
                   name="dateOfDeath"
                   value={formData.dateOfDeath}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                  className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                     errors.dateOfDeath ? 'border-red-500' : 'border-emerald-200'
                   }`}
                 />
@@ -655,7 +655,7 @@ const ScholarForm = ({ onSuccess }) => {
                         type="text"
                         value={work.title}
                         onChange={(e) => handleWorkChange(index, 'title', e.target.value)}
-                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 text-black focus:border-emerald-500 bg-white ${
                           errors[`work_title_${index}`] ? 'border-red-500' : 'border-emerald-200'
                         }`}
                         placeholder="e.g., The Jurisprudence of Zakat"
@@ -676,7 +676,7 @@ const ScholarForm = ({ onSuccess }) => {
                         max={new Date().getFullYear()}
                         value={work.year}
                         onChange={(e) => handleWorkChange(index, 'year', e.target.value)}
-                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${
+                        className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white ${
                           errors[`work_year_${index}`] ? 'border-red-500' : 'border-emerald-200'
                         }`}
                         placeholder="2023"

@@ -440,7 +440,7 @@ const BookForm = ({ onSuccess }) => {
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.title ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="e.g., Understanding the Quran in the Digital Age"
@@ -458,7 +458,7 @@ const BookForm = ({ onSuccess }) => {
                 name="author"
                 value={formData.author}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.author ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="e.g., Dr. Ahmad Al-Zahra"
@@ -476,7 +476,7 @@ const BookForm = ({ onSuccess }) => {
                 name="publisher"
                 value={formData.publisher}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-emerald-200 text-black rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g., Dar Al-Fikr Publishing"
               />
             </div>
@@ -491,7 +491,7 @@ const BookForm = ({ onSuccess }) => {
               name="category"
               value={formData.category}
               onChange={handleInputChange}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.category ? 'border-red-500' : 'border-emerald-200'
               }`}
             >
@@ -513,7 +513,7 @@ const BookForm = ({ onSuccess }) => {
               value={formData.description}
               onChange={handleInputChange}
               rows={4}
-              className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.description ? 'border-red-500' : 'border-emerald-200'
               }`}
               placeholder="Write a comprehensive description about the book's content and objectives..."
@@ -682,7 +682,7 @@ const BookForm = ({ onSuccess }) => {
                 onChange={handleInputChange}
                 min="1400"
                 max={new Date().getFullYear()}
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.publishedYear ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="2024"
@@ -701,7 +701,7 @@ const BookForm = ({ onSuccess }) => {
                 value={formData.pages}
                 onChange={handleInputChange}
                 min="1"
-                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                className={`w-full px-4 py-3 border rounded-xl text-black focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                   errors.pages ? 'border-red-500' : 'border-emerald-200'
                 }`}
                 placeholder="300"
@@ -718,7 +718,7 @@ const BookForm = ({ onSuccess }) => {
                 name="language"
                 value={formData.language}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border text-black border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {languages.map((lang) => (
                   <option key={lang} value={lang}>{lang}</option>
@@ -736,7 +736,7 @@ const BookForm = ({ onSuccess }) => {
                 name="isbn"
                 value={formData.isbn}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border text-black border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="978-0-123456-78-9"
               />
             </div>
@@ -754,7 +754,7 @@ const BookForm = ({ onSuccess }) => {
                 name="customTag"
                 value={formData.customTag}
                 onChange={handleInputChange}
-                className="flex-1 px-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="flex-1 px-4 py-3 text-black border border-emerald-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Add a keyword or tag..."
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
