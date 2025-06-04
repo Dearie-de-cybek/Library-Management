@@ -129,7 +129,7 @@ const ScholarsPage = () => {
                 placeholder="Search for a scholar..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+                className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
               />
             </div>
 
@@ -137,7 +137,7 @@ const ScholarsPage = () => {
             <select
               value={selectedSpecialization}
               onChange={(e) => setSelectedSpecialization(e.target.value)}
-              className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+              className="py-3 px-4 border border-emerald-200 rounded-xl text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
               <option value="all">All Specializations</option>
               {specializations.map(spec => (
@@ -149,7 +149,7 @@ const ScholarsPage = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+              className="py-3 px-4 border border-emerald-200 rounded-xl text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
               <option value="name">Sort by Name</option>
               <option value="works">Sort by Number of Works</option>

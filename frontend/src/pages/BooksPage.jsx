@@ -242,7 +242,7 @@ const BooksPage = () => {
                 placeholder="Search by title, author, or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+                className="w-full pl-12 pr-4 py-3 border border-emerald-200 rounded-xl focus:ring-2 text-emerald-700 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
               />
             </div>
 
@@ -250,7 +250,7 @@ const BooksPage = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+              className="py-3 px-4 border border-emerald-200 rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
               <option value="all">All Categories</option>
               {categories.map(category => (
@@ -262,7 +262,7 @@ const BooksPage = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="py-3 px-4 border border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
+              className="py-3 px-4 border border-emerald-200 rounded-xl text-black focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white/90"
             >
               <option value="downloads">Most Downloaded</option>
               <option value="title">Alphabetical</option>
@@ -513,23 +513,23 @@ const BooksPage = () => {
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">Category:</span>
-                        <p className="font-semibold">{selectedBook.category}</p>
+                        <p className="font-semibold text-emerald-700">{selectedBook.category}</p>
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">Pages:</span>
-                        <p className="font-semibold">{selectedBook.pages} pages</p>
+                        <p className="font-semibold text-emerald-700">{selectedBook.pages} pages</p>
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">Published:</span>
-                        <p className="font-semibold">{selectedBook.publishedYear}</p>
+                        <p className="font-semibold text-emerald-700">{selectedBook.publishedYear}</p>
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">ISBN:</span>
-                        <p className="font-semibold text-sm">{selectedBook.isbn || 'N/A'}</p>
+                        <p className="font-semibold text-sm text-emerald-700">{selectedBook.isbn || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="text-gray-600 text-sm">Language:</span>
-                        <p className="font-semibold">{selectedBook.language}</p>
+                        <p className="font-semibold text-emerald-700">{selectedBook.language}</p>
                       </div>
                     </div>
 
