@@ -7,6 +7,7 @@ import AdminDashboard from "./admin/AdminDashboard";
 import AdminLogin from "./admin/AdminLogin";
 import Register from "./components/Register";
 import Login from "./components/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 
 function App() {
@@ -14,12 +15,37 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/scholars" element={<ScholarsPage />} />
-        <Route path="/books" element={<BooksPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        
+        {/* Protected Routes - Require Authentication */}
+        <Route 
+          path="/scholars" 
+          element={
+            <ProtectedRoute>
+              <ScholarsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/books" 
+          element={
+            <ProtectedRoute>
+              <BooksPage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Admin Only Routes */}
+        <Route 
+          path="/admin" 
+          element={
+            <ProtectedRoute adminOnly={true}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </AuthProvider>
   );
