@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import LoadingScreen from '../components/LoadingScreen';
 import LibraryService from '../services/dataService';
@@ -9,10 +10,12 @@ const BooksPage = () => {
   const [books, setBooks] = useState([]);
   const [selectedBook, setSelectedBook] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [downloadLoading, setDownloadLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('downloads');
   const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const { user } = useAuth();
 
   useEffect(() => {
     loadBooks();
@@ -39,6 +42,75 @@ const BooksPage = () => {
 
   const closeModal = () => {
     setSelectedBook(null);
+  };
+
+  const handleDownloadBook = async (bookId) => {
+    if (!bookId) return;
+    
+    try {
+      setDownloadLoading(true);
+      
+      // Call the download API
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api'}/downloads/book/${bookId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to download book');
+      }
+
+      // Get filename from response headers
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = selectedBook?.title + '.pdf';
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch) {
+          filename = filenameMatch[1].replace(/['"]/g, '');
+          filename = decodeURIComponent(filename);
+        }
+      }
+
+      // Create blob and download
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      // Update book download count in local state
+      setBooks(prevBooks => 
+        prevBooks.map(book => 
+          book.id === bookId 
+            ? { ...book, downloads: (book.downloads || 0) + 1 }
+            : book
+        )
+      );
+
+      // Update selected book if it's the one being downloaded
+      if (selectedBook && selectedBook.id === bookId) {
+        setSelectedBook(prev => ({
+          ...prev,
+          downloads: (prev.downloads || 0) + 1
+        }));
+      }
+
+      // Show success message (you can replace with a toast notification)
+      alert('Book downloaded successfully!');
+
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download book. Please try again.');
+    } finally {
+      setDownloadLoading(false);
+    }
   };
 
   // Filter and sort books with safety check
@@ -105,6 +177,11 @@ const BooksPage = () => {
           <p className="text-lg text-gray-700 max-w-4xl mx-auto">
             Discover our comprehensive collection of diverse Islamic books covering all aspects of Islamic sciences and religious knowledge
           </p>
+          {user && (
+            <p className="text-sm text-emerald-600 mt-4">
+              Welcome back, {user.name}! You can now download books.
+            </p>
+          )}
         </motion.div>
 
         {/* Advanced Search & Filter Controls */}
@@ -307,7 +384,7 @@ const BooksPage = () => {
                       
                       <div className="flex items-center justify-between">
                         <div className="flex gap-2">
-                          {book.tags.slice(0, 3).map(tag => (
+                          {book.tags && book.tags.slice(0, 3).map(tag => (
                             <span key={tag} className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs">
                               {tag}
                             </span>
@@ -425,7 +502,7 @@ const BooksPage = () => {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-2xl font-bold text-emerald-800">{selectedBook.downloads.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-emerald-800">{selectedBook.downloads?.toLocaleString() || '0'}</p>
                           <p className="text-emerald-600 text-sm">Total Downloads</p>
                         </div>
                       </div>
@@ -440,21 +517,42 @@ const BooksPage = () => {
                     </div>
 
                     {/* Tags */}
-                    <div className="mb-6">
-                      <h5 className="font-bold text-gray-900 mb-3">Keywords:</h5>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedBook.tags.map(tag => (
-                          <span key={tag} className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
-                            {tag}
-                          </span>
-                        ))}
+                    {selectedBook.tags && selectedBook.tags.length > 0 && (
+                      <div className="mb-6">
+                        <h5 className="font-bold text-gray-900 mb-3">Keywords:</h5>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedBook.tags.map(tag => (
+                            <span key={tag} className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-sm font-medium">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
-                      <button className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200">
-                        Download Book
+                      <button 
+                        onClick={() => handleDownloadBook(selectedBook.id)}
+                        disabled={downloadLoading}
+                        className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 text-white py-3 px-6 rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {downloadLoading ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25"></circle>
+                              <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" className="opacity-75"></path>
+                            </svg>
+                            Downloading...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                            Download Book
+                          </>
+                        )}
                       </button>
                       <button className="px-6 py-3 border-2 border-emerald-600 text-emerald-600 rounded-xl font-bold hover:bg-emerald-50 transition-all duration-200">
                         Preview
