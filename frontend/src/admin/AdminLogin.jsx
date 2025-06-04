@@ -24,37 +24,40 @@ const AdminLoginPage = () => {
     if (error) setError('');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!formData.email || !formData.password) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  setLoading(true);
+  setError('');
+
+  try {
+    const response = await LibraryService.login(formData);
     
-    if (!formData.email || !formData.password) {
-      setError('Please fill in all fields');
+    // Check if user is admin
+    const user = response.data?.user || response.user;
+    if (user?.role !== 'admin') {
+      setError('Access denied. Administrator privileges required.');
+      await LibraryService.logout(); // Logout if not admin
       return;
     }
-
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await LibraryService.login(formData);
-      
-      // Check if user is admin
-      const user = response.data?.user || response.user;
-      if (user?.role !== 'admin') {
-        setError('Access denied. Administrator privileges required.');
-        await LibraryService.logout(); // Logout if not admin
-        return;
-      }
-      
-      // Redirect to admin dashboard
-      navigate('/admin');
-      window.location.reload(); // Refresh to update auth state
-    } catch (error) {
-      setError(error.message || 'Admin login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    
+    // Option 1: Use window.location.href for immediate redirect with reload
+    window.location.href = '/admin';
+    
+    // Option 2: Alternative - navigate without reload (comment out option 1 if using this)
+    // navigate('/admin');
+    
+  } catch (error) {
+    setError(error.message || 'Admin login failed. Please check your credentials.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-slate-100 to-gray-200 flex items-center justify-center p-4">
