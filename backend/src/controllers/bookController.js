@@ -1,6 +1,6 @@
-const { Book, Scholar, Category } = require('../models');
-const { catchAsync, ApiError } = require('../middleware/errorHandler');
-const { getFileUrl, deleteFile } = require('../middleware/fileUpload');
+const { Book, Scholar, Category } = require("../models");
+const { catchAsync, ApiError } = require("../middleware/errorHandler");
+const { getFileUrl, deleteFile } = require("../middleware/fileUpload");
 
 /**
  * @desc    Get all books with pagination and filtering
@@ -15,8 +15,8 @@ const getAllBooks = catchAsync(async (req, res, next) => {
     language,
     author,
     year,
-    sort = '-createdAt',
-    q
+    sort = "-createdAt",
+    q,
   } = req.query;
 
   // Build filter object
@@ -25,11 +25,11 @@ const getAllBooks = catchAsync(async (req, res, next) => {
   // Text search
   if (q) {
     filter.$or = [
-      { title: { $regex: q, $options: 'i' } },
-      { author: { $regex: q, $options: 'i' } },
-      { description: { $regex: q, $options: 'i' } },
-      { tags: { $in: [new RegExp(q, 'i')] } },
-      { searchKeywords: { $in: [new RegExp(q, 'i')] } }
+      { title: { $regex: q, $options: "i" } },
+      { author: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+      { tags: { $in: [new RegExp(q, "i")] } },
+      { searchKeywords: { $in: [new RegExp(q, "i")] } },
     ];
   }
 
@@ -40,7 +40,7 @@ const getAllBooks = catchAsync(async (req, res, next) => {
   if (language) filter.language = language;
 
   // Author filter
-  if (author) filter.author = { $regex: author, $options: 'i' };
+  if (author) filter.author = { $regex: author, $options: "i" };
 
   // Year filter
   if (year) filter.publishedYear = parseInt(year);
@@ -50,8 +50,8 @@ const getAllBooks = catchAsync(async (req, res, next) => {
 
   // Execute query
   const books = await Book.find(filter)
-    .populate('scholarAuthor', 'name title specialization')
-    .populate('addedBy', 'name email')
+    .populate("scholarAuthor", "name title specialization")
+    .populate("addedBy", "name email")
     .sort(sort)
     .limit(limit * 1)
     .skip(skip)
@@ -61,26 +61,26 @@ const getAllBooks = catchAsync(async (req, res, next) => {
   const total = await Book.countDocuments(filter);
 
   // Add file URLs to books
-  const booksWithUrls = books.map(book => ({
+  const booksWithUrls = books.map((book) => ({
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null
+    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null,
   }));
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     count: books.length,
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),
       total,
-      pages: Math.ceil(total / limit)
+      pages: Math.ceil(total / limit),
     },
     data: {
-      books: booksWithUrls
-    }
+      books: booksWithUrls,
+    },
   });
 });
 
@@ -91,16 +91,16 @@ const getAllBooks = catchAsync(async (req, res, next) => {
  */
 const getBook = catchAsync(async (req, res, next) => {
   const book = await Book.findById(req.params.id)
-    .populate('scholarAuthor', 'name title specialization bio image')
-    .populate('addedBy', 'name email')
+    .populate("scholarAuthor", "name title specialization bio image")
+    .populate("addedBy", "name email")
     .lean();
 
   if (!book) {
-    return next(new ApiError('Book not found', 404));
+    return next(new ApiError("Book not found", 404));
   }
 
   if (!book.isActive) {
-    return next(new ApiError('Book is not available', 404));
+    return next(new ApiError("Book is not available", 404));
   }
 
   // Increment view count
@@ -109,17 +109,17 @@ const getBook = catchAsync(async (req, res, next) => {
   // Add file URLs
   const bookWithUrls = {
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null
+    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null,
   };
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
-      book: bookWithUrls
-    }
+      book: bookWithUrls,
+    },
   });
 });
 
@@ -136,7 +136,7 @@ const createBook = catchAsync(async (req, res, next) => {
   if (req.body.scholarAuthor) {
     const scholar = await Scholar.findById(req.body.scholarAuthor);
     if (!scholar) {
-      return next(new ApiError('Scholar not found', 404));
+      return next(new ApiError("Scholar not found", 404));
     }
   }
 
@@ -146,24 +146,24 @@ const createBook = catchAsync(async (req, res, next) => {
   await Category.updateCategoryStats(book.category, 1, 0);
 
   // Populate the created book
-  await book.populate('scholarAuthor', 'name title');
-  await book.populate('addedBy', 'name email');
+  await book.populate("scholarAuthor", "name title");
+  await book.populate("addedBy", "name email");
 
   // Add file URLs
   const bookWithUrls = {
     ...book.toObject(),
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null
+    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null,
   };
 
   res.status(201).json({
-    status: 'success',
-    message: 'Book created successfully',
+    status: "success",
+    message: "Book created successfully",
     data: {
-      book: bookWithUrls
-    }
+      book: bookWithUrls,
+    },
   });
 });
 
@@ -176,7 +176,7 @@ const updateBook = catchAsync(async (req, res, next) => {
   let book = await Book.findById(req.params.id);
 
   if (!book) {
-    return next(new ApiError('Book not found', 404));
+    return next(new ApiError("Book not found", 404));
   }
 
   // Check if category is being changed
@@ -184,17 +184,22 @@ const updateBook = catchAsync(async (req, res, next) => {
   const newCategory = req.body.category;
 
   // If scholarAuthor is being updated, verify it exists
-  if (req.body.scholarAuthor && req.body.scholarAuthor !== book.scholarAuthor?.toString()) {
+  if (
+    req.body.scholarAuthor &&
+    req.body.scholarAuthor !== book.scholarAuthor?.toString()
+  ) {
     const scholar = await Scholar.findById(req.body.scholarAuthor);
     if (!scholar) {
-      return next(new ApiError('Scholar not found', 404));
+      return next(new ApiError("Scholar not found", 404));
     }
   }
 
   book = await Book.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidators: true
-  }).populate('scholarAuthor', 'name title').populate('addedBy', 'name email');
+    runValidators: true,
+  })
+    .populate("scholarAuthor", "name title")
+    .populate("addedBy", "name email");
 
   // Update category counts if category changed
   if (oldCategory !== newCategory && newCategory) {
@@ -205,18 +210,18 @@ const updateBook = catchAsync(async (req, res, next) => {
   // Add file URLs
   const bookWithUrls = {
     ...book.toObject(),
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null
+    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null,
   };
 
   res.status(200).json({
-    status: 'success',
-    message: 'Book updated successfully',
+    status: "success",
+    message: "Book updated successfully",
     data: {
-      book: bookWithUrls
-    }
+      book: bookWithUrls,
+    },
   });
 });
 
@@ -229,7 +234,7 @@ const deleteBook = catchAsync(async (req, res, next) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return next(new ApiError('Book not found', 404));
+    return next(new ApiError("Book not found", 404));
   }
 
   // Delete associated files
@@ -237,16 +242,16 @@ const deleteBook = catchAsync(async (req, res, next) => {
     try {
       await deleteFile(book.bookFile.path);
     } catch (error) {
-      console.error('Error deleting book file:', error);
+      console.error("Error deleting book file:", error);
     }
   }
 
   // If cover image is a local file (not URL), delete it
-  if (book.coverImage && !book.coverImage.startsWith('http')) {
+  if (book.coverImage && !book.coverImage.startsWith("http")) {
     try {
       await deleteFile(book.coverImage);
     } catch (error) {
-      console.error('Error deleting cover image:', error);
+      console.error("Error deleting cover image:", error);
     }
   }
 
@@ -257,8 +262,8 @@ const deleteBook = catchAsync(async (req, res, next) => {
   await Book.findByIdAndDelete(req.params.id);
 
   res.status(200).json({
-    status: 'success',
-    message: 'Book deleted successfully'
+    status: "success",
+    message: "Book deleted successfully",
   });
 });
 
@@ -271,11 +276,11 @@ const uploadBookFile = catchAsync(async (req, res, next) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return next(new ApiError('Book not found', 404));
+    return next(new ApiError("Book not found", 404));
   }
 
   if (!req.file) {
-    return next(new ApiError('Please upload a PDF file', 400));
+    return next(new ApiError("Please upload a PDF file", 400));
   }
 
   // Delete old book file if it exists
@@ -283,7 +288,7 @@ const uploadBookFile = catchAsync(async (req, res, next) => {
     try {
       await deleteFile(book.bookFile.path);
     } catch (error) {
-      console.error('Error deleting old book file:', error);
+      console.error("Error deleting old book file:", error);
     }
   }
 
@@ -294,21 +299,21 @@ const uploadBookFile = catchAsync(async (req, res, next) => {
     size: req.file.size,
     mimetype: req.file.mimetype,
     path: req.file.path,
-    uploadDate: new Date()
+    uploadDate: new Date(),
   };
 
   await book.save();
 
   res.status(200).json({
-    status: 'success',
-    message: 'Book file uploaded successfully',
+    status: "success",
+    message: "Book file uploaded successfully",
     data: {
       bookFile: {
         ...book.bookFile,
         url: getFileUrl(req, book.bookFile.path),
-        formattedSize: book.fileSizeFormatted
-      }
-    }
+        formattedSize: book.fileSizeFormatted,
+      },
+    },
   });
 });
 
@@ -321,19 +326,19 @@ const uploadCoverImage = catchAsync(async (req, res, next) => {
   const book = await Book.findById(req.params.id);
 
   if (!book) {
-    return next(new ApiError('Book not found', 404));
+    return next(new ApiError("Book not found", 404));
   }
 
   if (!req.file) {
-    return next(new ApiError('Please upload an image file', 400));
+    return next(new ApiError("Please upload an image file", 400));
   }
 
   // Delete old cover image if it's a local file
-  if (book.coverImage && !book.coverImage.startsWith('http')) {
+  if (book.coverImage && !book.coverImage.startsWith("http")) {
     try {
       await deleteFile(book.coverImage);
     } catch (error) {
-      console.error('Error deleting old cover image:', error);
+      console.error("Error deleting old cover image:", error);
     }
   }
 
@@ -342,14 +347,14 @@ const uploadCoverImage = catchAsync(async (req, res, next) => {
   await book.save();
 
   res.status(200).json({
-    status: 'success',
-    message: 'Cover image uploaded successfully',
+    status: "success",
+    message: "Cover image uploaded successfully",
     data: {
       coverImage: {
         path: book.coverImage,
-        url: getFileUrl(req, book.coverImage)
-      }
-    }
+        url: getFileUrl(req, book.coverImage),
+      },
+    },
   });
 });
 
@@ -360,12 +365,12 @@ const uploadCoverImage = catchAsync(async (req, res, next) => {
  */
 const getBooksByCategory = catchAsync(async (req, res, next) => {
   const { category } = req.params;
-  const { page = 1, limit = 20, sort = '-downloads' } = req.query;
+  const { page = 1, limit = 20, sort = "-downloads" } = req.query;
 
   const skip = (page - 1) * limit;
 
   const books = await Book.find({ category, isActive: true })
-    .populate('scholarAuthor', 'name title')
+    .populate("scholarAuthor", "name title")
     .sort(sort)
     .limit(limit * 1)
     .skip(skip)
@@ -374,27 +379,27 @@ const getBooksByCategory = catchAsync(async (req, res, next) => {
   const total = await Book.countDocuments({ category, isActive: true });
 
   // Add file URLs
-  const booksWithUrls = books.map(book => ({
+  const booksWithUrls = books.map((book) => ({
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null
+    bookFileUrl: book.bookFile ? getFileUrl(req, book.bookFile.path) : null,
   }));
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     count: books.length,
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),
       total,
-      pages: Math.ceil(total / limit)
+      pages: Math.ceil(total / limit),
     },
     data: {
       books: booksWithUrls,
-      category
-    }
+      category,
+    },
   });
 });
 
@@ -409,19 +414,19 @@ const getPopularBooks = catchAsync(async (req, res, next) => {
   const books = await Book.getPopularBooks(parseInt(limit));
 
   // Add file URLs
-  const booksWithUrls = books.map(book => ({
+  const booksWithUrls = books.map((book) => ({
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
-      : getFileUrl(req, book.coverImage)
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
+      : getFileUrl(req, book.coverImage),
   }));
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     count: books.length,
     data: {
-      books: booksWithUrls
-    }
+      books: booksWithUrls,
+    },
   });
 });
 
@@ -436,19 +441,19 @@ const getRecentBooks = catchAsync(async (req, res, next) => {
   const books = await Book.getRecentBooks(parseInt(limit));
 
   // Add file URLs
-  const booksWithUrls = books.map(book => ({
+  const booksWithUrls = books.map((book) => ({
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
-      : getFileUrl(req, book.coverImage)
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
+      : getFileUrl(req, book.coverImage),
   }));
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     count: books.length,
     data: {
-      books: booksWithUrls
-    }
+      books: booksWithUrls,
+    },
   });
 });
 
@@ -466,11 +471,11 @@ const searchBooks = catchAsync(async (req, res, next) => {
     year,
     page = 1,
     limit = 20,
-    sort = '-createdAt'
+    sort = "-createdAt",
   } = req.query;
 
   if (!q && !category && !language && !author && !year) {
-    return next(new ApiError('At least one search parameter is required', 400));
+    return next(new ApiError("At least one search parameter is required", 400));
   }
 
   const filter = { isActive: true };
@@ -483,13 +488,13 @@ const searchBooks = catchAsync(async (req, res, next) => {
   // Additional filters
   if (category) filter.category = category;
   if (language) filter.language = language;
-  if (author) filter.author = { $regex: author, $options: 'i' };
+  if (author) filter.author = { $regex: author, $options: "i" };
   if (year) filter.publishedYear = parseInt(year);
 
   const skip = (page - 1) * limit;
 
   const books = await Book.find(filter)
-    .populate('scholarAuthor', 'name title')
+    .populate("scholarAuthor", "name title")
     .sort(sort)
     .limit(limit * 1)
     .skip(skip)
@@ -498,27 +503,27 @@ const searchBooks = catchAsync(async (req, res, next) => {
   const total = await Book.countDocuments(filter);
 
   // Add file URLs and text search score
-  const booksWithUrls = books.map(book => ({
+  const booksWithUrls = books.map((book) => ({
     ...book,
-    coverImageUrl: book.coverImage.startsWith('http') 
-      ? book.coverImage 
+    coverImageUrl: book.coverImage.startsWith("http")
+      ? book.coverImage
       : getFileUrl(req, book.coverImage),
-    searchScore: book.score // Text search score
+    searchScore: book.score, // Text search score
   }));
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     count: books.length,
     searchQuery: { q, category, language, author, year },
     pagination: {
       page: parseInt(page),
       limit: parseInt(limit),
       total,
-      pages: Math.ceil(total / limit)
+      pages: Math.ceil(total / limit),
     },
     data: {
-      books: booksWithUrls
-    }
+      books: booksWithUrls,
+    },
   });
 });
 
@@ -533,5 +538,5 @@ module.exports = {
   getBooksByCategory,
   getPopularBooks,
   getRecentBooks,
-  searchBooks
+  searchBooks,
 };

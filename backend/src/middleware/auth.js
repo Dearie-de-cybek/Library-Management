@@ -1,6 +1,6 @@
-
 const jwt = require('jsonwebtoken');
-const { User } = require('../models');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const auth = async (req, res, next) => {
   try {
@@ -37,7 +37,20 @@ const auth = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
       // Get user from database
-      const user = await User.findById(decoded.id).select('-password');
+      const user = await prisma.user.findUnique({
+        where: { id: parseInt(decoded.id) },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+          joinDate: true,
+          lastActive: true,
+          totalDownloads: true,
+          monthlyDownloads: true
+        }
+      });
       
       if (!user) {
         return res.status(401).json({
@@ -55,8 +68,10 @@ const auth = async (req, res, next) => {
       }
 
       // Update last active date
-      user.lastActive = new Date();
-      await user.save();
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { lastActive: new Date() }
+      });
 
       // Add user to request object
       req.user = user;
@@ -108,12 +123,28 @@ const optionalAuth = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select('-password');
+      const user = await prisma.user.findUnique({
+        where: { id: parseInt(decoded.id) },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          status: true,
+          joinDate: true,
+          lastActive: true,
+          totalDownloads: true,
+          monthlyDownloads: true
+        }
+      });
       
       if (user && user.status === 'active') {
         req.user = user;
-        user.lastActive = new Date();
-        await user.save();
+        // Update last active date
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { lastActive: new Date() }
+        });
       }
     } catch (tokenError) {
       // Ignore token errors in optional auth
