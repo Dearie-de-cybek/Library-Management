@@ -1,6 +1,6 @@
+
 const jwt = require('jsonwebtoken');
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { User } = require('../models');
 
 const auth = async (req, res, next) => {
   try {
@@ -37,20 +37,7 @@ const auth = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
       // Get user from database
-      const user = await prisma.user.findUnique({
-        where: { id: parseInt(decoded.id) },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          status: true,
-          joinDate: true,
-          lastActive: true,
-          totalDownloads: true,
-          monthlyDownloads: true
-        }
-      });
+      const user = await User.findById(decoded.id).select('-password');
       
       if (!user) {
         return res.status(401).json({
@@ -68,10 +55,8 @@ const auth = async (req, res, next) => {
       }
 
       // Update last active date
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { lastActive: new Date() }
-      });
+      user.lastActive = new Date();
+      await user.save();
 
       // Add user to request object
       req.user = user;
@@ -123,28 +108,12 @@ const optionalAuth = async (req, res, next) => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await prisma.user.findUnique({
-        where: { id: parseInt(decoded.id) },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          role: true,
-          status: true,
-          joinDate: true,
-          lastActive: true,
-          totalDownloads: true,
-          monthlyDownloads: true
-        }
-      });
+      const user = await User.findById(decoded.id).select('-password');
       
       if (user && user.status === 'active') {
         req.user = user;
-        // Update last active date
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastActive: new Date() }
-        });
+        user.lastActive = new Date();
+        await user.save();
       }
     } catch (tokenError) {
       // Ignore token errors in optional auth

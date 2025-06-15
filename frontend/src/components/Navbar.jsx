@@ -38,8 +38,8 @@ const Navbar = () => {
               </svg>
             </div>
             <div className="hidden md:block">
-              <h1 className="text-lg font-bold text-emerald-800" dir="rtl">المكتبة الإسلامية</h1>
-              <p className="text-xs text-emerald-600">Islamic Library</p>
+              <h1 className="text-lg font-bold text-emerald-800" dir="rtl">مكتبة يحيى باوا الإسلامية</h1>
+              <p className="text-xs text-emerald-600">Yahaya Bawa Islamic Library</p>
             </div>
           </Link>
 
