@@ -109,7 +109,8 @@ export const AuthProvider = ({ children }) => {
       });
       return response;
     } catch (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+      dispatch({ type: 'LOGIN_FAILURE', payload: `Invalid credientials please try again بيانات الاعتماد غير صالحة، يرجى المحاولة مرة أخرى
+` });
       throw error;
     }
   };
@@ -132,7 +133,7 @@ export const AuthProvider = ({ children }) => {
       });
       return response;
     } catch (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: error.message });
+      dispatch({ type: 'LOGIN_FAILURE', payload: 'Registration failed. Please try again. فشل التسجيل. يرجى المحاولة مرة أخرى' });
       throw error;
     }
   };

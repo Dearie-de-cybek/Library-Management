@@ -18,33 +18,33 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-        
+
         {/* Protected Routes - Require Authentication */}
-        <Route 
-          path="/scholars" 
+        <Route
+          path="/scholars"
           element={
             <ProtectedRoute>
               <ScholarsPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/books" 
+        <Route
+          path="/books"
           element={
             <ProtectedRoute>
               <BooksPage />
             </ProtectedRoute>
-          } 
+          }
         />
-        
+
         {/* Admin Only Routes */}
-        <Route 
-          path="/admin" 
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute adminOnly={true}>
               <AdminDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
     </AuthProvider>

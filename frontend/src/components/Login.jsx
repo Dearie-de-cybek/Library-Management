@@ -14,9 +14,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // Clear error when component unmounts
-  useEffect(() => {
-    return () => clearError();
-  }, [clearError]);
+  // useEffect(() => {
+  //   return () => clearError();
+  // }, [clearError]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -106,7 +106,7 @@ const Login = () => {
               onChange={handleInputChange}
               required
               disabled={loading}
-              className="w-full px-4 py-3 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-4 py-3 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed text-black"
               placeholder="your.email@example.com"
             />
           </div>
@@ -127,7 +127,7 @@ const Login = () => {
                 onChange={handleInputChange}
                 required
                 disabled={loading}
-                className="w-full px-4 py-3 pr-12 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-3 pr-12 border-2 border-emerald-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-emerald-50/30 disabled:opacity-50 disabled:cursor-not-allowed text-black"
                 placeholder="Enter your password"
               />
               <button
